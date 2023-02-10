@@ -99,8 +99,53 @@ public class Main extends Application {
     double c = green_col / 255.0;
     Vector col = new Vector(0.5, c, 0.5);
 
+    Vector light = new Vector(250,250,-200);
+
+    Vector o = new Vector(0,0,0);
+    Vector d = new Vector(0,0,1);
+    Vector cs = new Vector(0,0,0);
+    double r = 100;
+    Vector p = new Vector(0,0,0);
+    Double t;
+    Double a, b;
+    Vector v = new Vector(0,0,0);
+
     for (j = 0; j < h; j++) {
       for (i = 0; i < w; i++) {
+        o.x=i-250;
+        o.y=j-250;
+        o.z=200;
+        v = o.sub(cs);
+        a=d.dot(d);
+        b = 2*v.dot(d);
+        c= v.dot(v) - r*r;
+
+        double disc = b*b-4*a*c;
+        if (disc < 0) {
+          col.x = 0.0;
+          col.y = 0.0;
+          col.z = 0.0;
+        }
+        else {
+          col.x = 1.0;
+          col.y = 1.0;
+          col.z = 1.0;
+        }
+        t = (-b-Math.sqrt(disc))/(2*a);
+        p=o.add(d.mul(t));
+        Vector lv = light.sub(p);
+        lv.normalise();
+        Vector n = p.sub(cs);
+        n.normalise();
+        double dp = lv.dot(n);
+        if (dp<0) {
+          col = new Vector(0,0,0);
+        } else {
+          if (dp>1) dp = 1;
+          col = new Vector(dp,dp,dp);
+        }
+
+
         image_writer.setColor(i, j, Color.color(col.x, col.y, col.z, 1.0));
       } // column loop
     } // row loop
