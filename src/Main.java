@@ -43,6 +43,9 @@ public class Main extends Application {
 
   int green_col = 255; //just for the test example
 
+  int xaxis = 0;
+  int yaxis = 320;
+
   @Override
   public void start(Stage stage) throws FileNotFoundException {
     stage.setTitle("Ray Tracing");
@@ -55,7 +58,10 @@ public class Main extends Application {
     //3. Add to the pane (below)
 
     //Create the simple GUI
-    Slider g_slider = new Slider(0, 255, green_col);
+
+    Slider g_slider = new Slider(5, 255, green_col);
+
+    Slider x_slider = new Slider(-320, 320, xaxis);
 
     //Add all the event handlers
     g_slider.valueProperty().addListener(
@@ -66,6 +72,16 @@ public class Main extends Application {
           Render(image);
         }
       });
+
+    x_slider.valueProperty().addListener(
+            new ChangeListener < Number > () {
+        public void changed(ObservableValue < ? extends Number >
+            observable, Number oldValue, Number newValue) {
+            xaxis = newValue.intValue();
+            Render(image);
+        }
+      });
+
 
     //The following is in case you want to interact with the image in any way
     //e.g., for user interaction, or you can find out the pixel position for debugging
@@ -83,7 +99,8 @@ public class Main extends Application {
     //3. (referring to the 3 things we need to display an image)
     //we need to add it to the pane
     root.add(view, 0, 0);
-    root.add(g_slider, 0, 1);
+    root.add(x_slider, 0, 1);
+    root.add(g_slider, 0, 2);
 
     //Display to user
     Scene scene = new Scene(root, 1024, 768);
@@ -99,19 +116,18 @@ public class Main extends Application {
     double c = green_col / 255.0;
     Vector col = new Vector(0.5, c, 0.5);
 
-
     Vector light = new Vector(250,250,-200);
 
-    Sphere s = new Sphere(100, new Vector(0,0,0));
+    Sphere s = new Sphere(100, new Vector(xaxis ,0,0));
 
     Vector o = new Vector(0,0,0); //origin of ray
     Vector d = new Vector(0,0,1); //direction of ray
     //Vector cs = new Vector(0,0,0); //centre of sphere
     //double r = 100; //radius of sphere
-    Vector p = new Vector(0,0,0); //3D points
+    Vector p; //3D points
     double t; // solution, where on the line it intersects the sphere
     double a, b;
-    Vector v = new Vector(0,0,0);
+    Vector v;
 
     for (j = 0; j < h; j++) {
       for (i = 0; i < w; i++) {
