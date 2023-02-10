@@ -102,10 +102,12 @@ public class Main extends Application {
 
     Vector light = new Vector(250,250,-200);
 
+    Sphere s = new Sphere(100, new Vector(0,0,0));
+
     Vector o = new Vector(0,0,0); //origin of ray
     Vector d = new Vector(0,0,1); //direction of ray
-    Vector cs = new Vector(0,0,0); //centre of sphere
-    double r = 100; //radius of sphere
+    //Vector cs = new Vector(0,0,0); //centre of sphere
+    //double r = 100; //radius of sphere
     Vector p = new Vector(0,0,0); //3D points
     double t; // solution, where on the line it intersects the sphere
     double a, b;
@@ -113,13 +115,13 @@ public class Main extends Application {
 
     for (j = 0; j < h; j++) {
       for (i = 0; i < w; i++) {
-        o.x = i-250;
-        o.y = j-250;
+        o.x = i-320;
+        o.y = j-320;
         o.z = -200;
-        v = o.sub(cs);
+        v = o.sub(s.getCentPos());
         a = d.dot(d);
         b = 2*v.dot(d);
-        c = v.dot(v) - r*r;
+        c = v.dot(v) - s.getRadius()*s.getRadius();
 
         double disc = b*b-4*a*c; //discriminant
         if (disc < 0) {
@@ -136,7 +138,7 @@ public class Main extends Application {
         p = o.add(d.mul(t)); //line
         Vector lv = light.sub(p);
         lv.normalise();
-        Vector n = p.sub(cs);
+        Vector n = p.sub(s.getCentPos());
         n.normalise();
         double dp = lv.dot(n);
         if (dp<0) {
