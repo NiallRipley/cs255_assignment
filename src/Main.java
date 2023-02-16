@@ -41,7 +41,9 @@ public class Main extends Application {
   int Width = 640;
   int Height = 640;
 
+  int red_col = 255;
   int green_col = 255; //just for the test example
+  int blue_col = 255;
 
   int xaxis = 0;
   int yaxis = 320;
@@ -58,12 +60,32 @@ public class Main extends Application {
     //3. Add to the pane (below)
 
     //Create the simple GUI
-
+    Slider r_slider = new Slider(0, 255, red_col);
     Slider g_slider = new Slider(0, 255, green_col);
+    Slider b_slider = new Slider(0, 255, blue_col);
 
     Slider x_slider = new Slider(-320, 320, xaxis);
 
     //Add all the event handlers
+    x_slider.valueProperty().addListener(
+            new ChangeListener < Number > () {
+              public void changed(ObservableValue < ? extends Number >
+                                          observable, Number oldValue, Number newValue) {
+                xaxis = newValue.intValue();
+                Render(image);
+              }
+            });
+
+    r_slider.valueProperty().addListener(
+            new ChangeListener < Number > () {
+              public void changed(ObservableValue < ? extends Number >
+                                          observable, Number oldValue, Number newValue) {
+                red_col = newValue.intValue();
+                Render(image);
+              }
+            });
+
+
     g_slider.valueProperty().addListener(
             new ChangeListener < Number > () {
               public void changed(ObservableValue < ? extends Number >
@@ -73,11 +95,11 @@ public class Main extends Application {
               }
             });
 
-    x_slider.valueProperty().addListener(
+    b_slider.valueProperty().addListener(
             new ChangeListener < Number > () {
               public void changed(ObservableValue < ? extends Number >
                                           observable, Number oldValue, Number newValue) {
-                xaxis = newValue.intValue();
+                blue_col = newValue.intValue();
                 Render(image);
               }
             });
@@ -100,7 +122,9 @@ public class Main extends Application {
     //we need to add it to the pane
     root.add(view, 0, 0);
     root.add(x_slider, 0, 1);
-    root.add(g_slider, 0, 2);
+    root.add(r_slider, 0, 2);
+    root.add(g_slider, 0, 3);
+    root.add(b_slider, 0, 4);
 
     //Display to user
     Scene scene = new Scene(root, 1024, 768);
@@ -123,12 +147,14 @@ public class Main extends Application {
     int w = (int) image.getWidth(), h = (int) image.getHeight(), i, j;
     PixelWriter image_writer = image.getPixelWriter();
 
+    double rc = red_col / 255.0;
     double gc = green_col / 255.0;
-    Vector col = new Vector(0.5, gc, 0.5);
+    double bc = blue_col / 255.0;
+
 
     Vector light = new Vector(0,150,-300);
 
-    Vector sphere_col = new Vector(1,gc,0);
+    Vector sphere_col = new Vector(rc,gc,bc);
     Sphere s = new Sphere(100, new Vector(xaxis ,0,0),sphere_col);
 
     Vector o = new Vector(0,0,0); //origin of ray
@@ -154,7 +180,7 @@ public class Main extends Application {
         double c = v.dot(v) - s.getRadius()*s.getRadius();
         double disc = Discriminant(a,b,c);
 
-        if (disc<0) {
+        if (disc < 0) {
           image_writer.setColor(i,j,Color.color(bg_col.x,bg_col.y,bg_col.z, 1.0));
         } else { //hit sphere
           image_writer.setColor(i,j,Color.color(sphere_col.x,sphere_col.y,sphere_col.z, 1.0));
@@ -177,8 +203,8 @@ public class Main extends Application {
             image_writer.setColor(i, j, Color.color(dp*sphere_col.x, dp*sphere_col.y, dp*sphere_col.z, 1.0));
           }
         }
-      } // column loop
-    } // row loop
+      } // column loop (x-axis loop)
+    } // row loop (y-axis loop)
   }
 
   public static void main(String[] args) {
