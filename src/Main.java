@@ -59,7 +59,7 @@ public class Main extends Application {
 
     //Create the simple GUI
 
-    Slider g_slider = new Slider(5, 255, green_col);
+    Slider g_slider = new Slider(0, 255, green_col);
 
     Slider x_slider = new Slider(-320, 320, xaxis);
 
@@ -108,9 +108,14 @@ public class Main extends Application {
     stage.show();
   }
 
-  public double quadratic(double a,double b,double c) {
-    double disc = b*b-4*a*c;
-    return (-b-Math.sqrt(disc))/(2*a);
+  public double Discriminant(double a, double b, double c) {
+    return b*b-4*a*c;
+  }
+
+  public double Quadratic(double a,double b,double c, Boolean close) {
+    double disc = Discriminant(a,b,c);
+    if (close) return (-b-Math.sqrt(disc))/(2*a);
+    else return (-b+Math.sqrt(disc))/(2*a);
   }
 
   public void Render(WritableImage image) {
@@ -118,8 +123,8 @@ public class Main extends Application {
     int w = (int) image.getWidth(), h = (int) image.getHeight(), i, j;
     PixelWriter image_writer = image.getPixelWriter();
 
-    double c = green_col / 255.0;
-    Vector col = new Vector(0.5, c, 0.5);
+    double gc = green_col / 255.0;
+    Vector col = new Vector(0.5, gc, 0.5);
 
     Vector light = new Vector(250,250,-200);
 
@@ -134,6 +139,10 @@ public class Main extends Application {
     double a, b;
     Vector v;
 
+    //col
+    Vector sphere_col = new Vector(1,gc,0);
+    Vector bg_col = new Vector(0.5,0.5,0.5);
+
     for (j = 0; j < h; j++) {
       for (i = 0; i < w; i++) {
         o.x = i-320;
@@ -142,9 +151,35 @@ public class Main extends Application {
         v = o.sub(s.getCentPos());
         a = d.dot(d);
         b = 2*v.dot(d);
-        c = v.dot(v) - s.getRadius()*s.getRadius();
+        double c = v.dot(v) - s.getRadius()*s.getRadius();
+        double disc = Discriminant(a,b,c);
 
-        t = quadratic(a,b,c); // ray sphere intersection
+        if (disc<0) {
+          image_writer.setColor(i,j,Color.color(bg_col.x,bg_col.y,bg_col.z, 1.0));
+        } else { //hit sphere
+          image_writer.setColor(i,j,Color.color(sphere_col.x,sphere_col.y,sphere_col.z, 1.0));
+          t = Quadratic(a,b,c,true); // ray sphere intersection, how far along
+          if (t<0) t = Quadratic(a,b,c,false);
+          if (t<0)
+            image_writer.setColor(i,j,Color.color(bg_col.x,bg_col.y,bg_col.z, 1.0));
+          else {
+            p = o.add(d.mul(t)); //line
+            Vector lv = light.sub(p);
+            lv.normalise();
+            Vector n = p.sub(s.getCentPos());
+            n.normalise();
+            double dp = lv.dot(n);
+            if (dp<0) {
+              col = new Vector(0,gc,0);
+            } else {
+              if (dp>1) dp = 1;
+              col = new Vector(dp,dp,dp);
+            }
+            image_writer.setColor(i, j, Color.color(col.x, col.y, col.z, 1.0));
+          }
+        }
+
+        /*t = Quadratic(a,b,c); // ray sphere intersection
         p = o.add(d.mul(t)); //line
         Vector lv = light.sub(p);
         lv.normalise();
@@ -152,13 +187,13 @@ public class Main extends Application {
         n.normalise();
         double dp = lv.dot(n);
         if (dp<0) {
-          col = new Vector(0,0,0);
+          col = new Vector(0,gc,0);
         } else {
           if (dp>1) dp = 1;
           col = new Vector(dp,dp,dp);
         }
 
-        image_writer.setColor(i, j, Color.color(col.x, col.y, col.z, 1.0));
+        image_writer.setColor(i, j, Color.color(col.x, col.y, col.z, 1.0)); */
 
       } // column loop
     } // row loop
@@ -167,5 +202,4 @@ public class Main extends Application {
   public static void main(String[] args) {
     launch();
   }
-
 }
