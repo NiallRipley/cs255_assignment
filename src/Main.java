@@ -65,22 +65,22 @@ public class Main extends Application {
 
     //Add all the event handlers
     g_slider.valueProperty().addListener(
-      new ChangeListener < Number > () {
-        public void changed(ObservableValue < ? extends Number >
-          observable, Number oldValue, Number newValue) {
-          green_col = newValue.intValue();
-          Render(image);
-        }
-      });
+            new ChangeListener < Number > () {
+              public void changed(ObservableValue < ? extends Number >
+                                          observable, Number oldValue, Number newValue) {
+                green_col = newValue.intValue();
+                Render(image);
+              }
+            });
 
     x_slider.valueProperty().addListener(
             new ChangeListener < Number > () {
-        public void changed(ObservableValue < ? extends Number >
-            observable, Number oldValue, Number newValue) {
-            xaxis = newValue.intValue();
-            Render(image);
-        }
-      });
+              public void changed(ObservableValue < ? extends Number >
+                                          observable, Number oldValue, Number newValue) {
+                xaxis = newValue.intValue();
+                Render(image);
+              }
+            });
 
 
     //The following is in case you want to interact with the image in any way
@@ -106,6 +106,11 @@ public class Main extends Application {
     Scene scene = new Scene(root, 1024, 768);
     stage.setScene(scene);
     stage.show();
+  }
+
+  public double quadratic(double a,double b,double c) {
+    double disc = b*b-4*a*c;
+    return (-b-Math.sqrt(disc))/(2*a);
   }
 
   public void Render(WritableImage image) {
@@ -139,18 +144,7 @@ public class Main extends Application {
         b = 2*v.dot(d);
         c = v.dot(v) - s.getRadius()*s.getRadius();
 
-        double disc = b*b-4*a*c; //discriminant
-        if (disc < 0) {
-          col.x = 0.0;
-          col.y = 0.0;
-          col.z = 0.0;
-        }
-        else {
-          col.x = 1.0;
-          col.y = 1.0;
-          col.z = 1.0;
-        }
-        t = (-b-Math.sqrt(disc))/(2*a); // ray sphere intersection
+        t = quadratic(a,b,c); // ray sphere intersection
         p = o.add(d.mul(t)); //line
         Vector lv = light.sub(p);
         lv.normalise();
