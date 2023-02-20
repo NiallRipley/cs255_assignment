@@ -8,6 +8,9 @@ All of those functions must be written by yourself
 You may use libraries to achieve a better GUI
 */
 import java.io.FileNotFoundException;
+import java.sql.Array;
+import java.util.ArrayList;
+
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -148,10 +151,14 @@ public class Main extends Application {
     Vector light = new Vector(0,150,-300);
 
     Vector sphere_col = new Vector(rc,gc,bc);
+    ArrayList<Sphere> sphereArray = new ArrayList<>();
     Sphere s1 = new Sphere(100, new Vector(s1xaxis,s1yaxis,s1zaxis),sphere_col);
     Sphere s2 = new Sphere(100, new Vector(s2xaxis,s2yaxis,s2zaxis),sphere_col);
     Sphere s3 = new Sphere(100, new Vector(s3xaxis,s3yaxis,s3zaxis),sphere_col);
 
+    sphereArray.add(s1);
+    sphereArray.add(s2);
+    sphereArray.add(s3);
 
 
     Vector o = new Vector(0,0,0); //origin of ray
@@ -171,13 +178,42 @@ public class Main extends Application {
         o.x = i-320;
         o.y = j-320;
         o.z = -200;
-        v = o.sub(s1.getCentPos());
-        a = d.dot(d);
-        b = 2*v.dot(d);
-        double c = v.dot(v) - s1.getRadius()*s1.getRadius();
-        double disc = Discriminant(a,b,c);
+        double currentSmallestT = 0;
+        for (int sp = 0; sp < sphereArray.size(); sp++) {
+          Sphere current = sphereArray.get(sp);
+          v = o.sub(current.getCentPos());
+          a = d.dot(d);
+          b = 2*v.dot(d);
+          double c = v.dot(v) - current.getRadius()*current.getRadius();
+          double disc = Discriminant(a,b,c);
 
-        if (disc < 0) {
+
+           if (disc>= 0) { //hit sphere
+            t = Quadratic(a,b,c,true); // ray sphere intersection, how far along
+            if (t<0) t = Quadratic(a,b,c,false);
+            if (t>=0 && t<currentSmallestT) currentSmallestT = t;
+          }
+        }
+        if (currentSmallestT < 0) {
+          image_writer.setColor(i,j,Color.color(bg_col.x,bg_col.y,bg_col.z, 1.0));
+        } else {
+          p = o.add(d.mul(currentSmallestT)); //line
+          Vector lv = light.sub(p);
+          lv.normalise();
+          Vector n = p.sub(s1.getCentPos());
+          n.normalise();
+          double dp = lv.dot(n);
+          if (dp<0) dp = 0;
+          if (dp>1) dp = 1;
+          image_writer.setColor(i, j, Color.color(dp*sphere_col.x, dp*sphere_col.y, dp*sphere_col.z, 1.0));
+        }
+
+
+        /*boolean sphereHit = false;
+        for (int q = 0; q < discArray.size(); q++) {
+          if (q>0) sphereHit = true;
+        }
+        if (!sphereHit) {
           image_writer.setColor(i,j,Color.color(bg_col.x,bg_col.y,bg_col.z, 1.0));
         } else { //hit sphere
           image_writer.setColor(i,j,Color.color(sphere_col.x,sphere_col.y,sphere_col.z, 1.0));
@@ -196,7 +232,7 @@ public class Main extends Application {
             if (dp>1) dp = 1;
             image_writer.setColor(i, j, Color.color(dp*sphere_col.x, dp*sphere_col.y, dp*sphere_col.z, 1.0));
           }
-        }
+        }*/
       } // column loop (x-axis loop)
     } // row loop (y-axis loop)
   }
