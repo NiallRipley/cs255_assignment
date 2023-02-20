@@ -178,7 +178,8 @@ public class Main extends Application {
         o.x = i-320;
         o.y = j-320;
         o.z = -200;
-        double currentSmallestT = -1;
+        double currentSmallestT = 999999999;
+        int currentIndex = 0;
         for (int sp = 0; sp < sphereArray.size(); sp++) {
           Sphere current = sphereArray.get(sp);
           v = o.sub(current.getCentPos());
@@ -193,6 +194,7 @@ public class Main extends Application {
             if (t<0) t = Quadratic(a,b,c,false);
             if (t>=0 && t<currentSmallestT) {
               currentSmallestT = t;
+              currentIndex = sp;
             }
           }
         }
@@ -202,7 +204,7 @@ public class Main extends Application {
           p = o.add(d.mul(currentSmallestT)); //line
           Vector lv = light.sub(p);
           lv.normalise();
-          Vector n = p.sub(s1.getCentPos());
+          Vector n = p.sub(sphereArray.get(currentIndex).getCentPos());
           n.normalise();
           double dp = lv.dot(n);
           if (dp<0) dp = 0;
