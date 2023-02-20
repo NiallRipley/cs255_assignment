@@ -7,35 +7,18 @@ Do not use JavaFX functions or other libraries to do the main parts of the assig
 All of those functions must be written by yourself
 You may use libraries to achieve a better GUI
 */
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.control.Label;
-import javafx.scene.control.Button;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.control.Toggle;
 import javafx.scene.control.Slider;
-import javafx.scene.control.CheckBox;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import java.util.ArrayList;
-import java.io.*;
-import java.lang.Math.*;
-import javafx.geometry.HPos;
 
 public class Main extends Application {
   int Width = 640;
@@ -45,9 +28,19 @@ public class Main extends Application {
   int green_col = 255; //just for the test example
   int blue_col = 255;
 
-  int xaxis = 0;
-  int yaxis = 320;
-
+  //sphere 1
+  int s1xaxis = 0;
+  int s1yaxis = 0;
+  int s1zaxis = 0;
+//spehere 2
+  int s2axis = 0;
+  int s2xaxis = -160;
+  int s2yaxis = 160;
+  int s2zaxis = 160;
+  //sphere 3
+  int s3xaxis = 160;
+  int s3yaxis = -160;
+  int s3zaxis = -160;
   @Override
   public void start(Stage stage) throws FileNotFoundException {
     stage.setTitle("Ray Tracing");
@@ -64,14 +57,14 @@ public class Main extends Application {
     Slider g_slider = new Slider(0, 255, green_col);
     Slider b_slider = new Slider(0, 255, blue_col);
 
-    Slider x_slider = new Slider(-320, 320, xaxis);
+    Slider x_slider = new Slider(-320, 320, s1xaxis);
 
     //Add all the event handlers
     x_slider.valueProperty().addListener(
             new ChangeListener < Number > () {
               public void changed(ObservableValue < ? extends Number >
                                           observable, Number oldValue, Number newValue) {
-                xaxis = newValue.intValue();
+                s1xaxis = newValue.intValue();
                 Render(image);
               }
             });
@@ -155,7 +148,11 @@ public class Main extends Application {
     Vector light = new Vector(0,150,-300);
 
     Vector sphere_col = new Vector(rc,gc,bc);
-    Sphere s = new Sphere(100, new Vector(xaxis ,0,0),sphere_col);
+    Sphere s1 = new Sphere(100, new Vector(s1xaxis,s1yaxis,s1zaxis),sphere_col);
+    Sphere s2 = new Sphere(100, new Vector(s2xaxis,s2yaxis,s2zaxis),sphere_col);
+    Sphere s3 = new Sphere(100, new Vector(s3xaxis,s3yaxis,s3zaxis),sphere_col);
+
+
 
     Vector o = new Vector(0,0,0); //origin of ray
     Vector d = new Vector(0,0,1); //direction of ray
@@ -174,10 +171,10 @@ public class Main extends Application {
         o.x = i-320;
         o.y = j-320;
         o.z = -200;
-        v = o.sub(s.getCentPos());
+        v = o.sub(s1.getCentPos());
         a = d.dot(d);
         b = 2*v.dot(d);
-        double c = v.dot(v) - s.getRadius()*s.getRadius();
+        double c = v.dot(v) - s1.getRadius()*s1.getRadius();
         double disc = Discriminant(a,b,c);
 
         if (disc < 0) {
@@ -192,14 +189,11 @@ public class Main extends Application {
             p = o.add(d.mul(t)); //line
             Vector lv = light.sub(p);
             lv.normalise();
-            Vector n = p.sub(s.getCentPos());
+            Vector n = p.sub(s1.getCentPos());
             n.normalise();
             double dp = lv.dot(n);
-            if (dp<0) {
-              dp = 0;
-            } else {
-              if (dp>1) dp = 1;
-            }
+            if (dp<0) dp = 0;
+            if (dp>1) dp = 1;
             image_writer.setColor(i, j, Color.color(dp*sphere_col.x, dp*sphere_col.y, dp*sphere_col.z, 1.0));
           }
         }

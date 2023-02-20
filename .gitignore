@@ -2,3 +2,5 @@
 *.class
 *.xml
 .idea/libraries/lib.xml
+*.xml
+*.xml
