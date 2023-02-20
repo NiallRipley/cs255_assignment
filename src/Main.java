@@ -179,7 +179,6 @@ public class Main extends Application {
         o.y = j-320;
         o.z = -200;
         double currentSmallestT = -1;
-        double currentDisc = -1;
         for (int sp = 0; sp < sphereArray.size(); sp++) {
           Sphere current = sphereArray.get(sp);
           v = o.sub(current.getCentPos());
@@ -194,11 +193,10 @@ public class Main extends Application {
             if (t<0) t = Quadratic(a,b,c,false);
             if (t>=0 && t<currentSmallestT) {
               currentSmallestT = t;
-              currentDisc = disc;
             }
           }
         }
-        if (currentDisc < 0) {
+        if (currentSmallestT < 0) {
           image_writer.setColor(i,j,Color.color(bg_col.x,bg_col.y,bg_col.z, 1.0));
         } else {
           p = o.add(d.mul(currentSmallestT)); //line
