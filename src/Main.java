@@ -15,6 +15,7 @@ import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.scene.control.Slider;
 import javafx.scene.image.ImageView;
@@ -22,6 +23,8 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 
 public class Main extends Application {
   int Width = 640;
@@ -62,7 +65,59 @@ public class Main extends Application {
 
     Slider x_slider = new Slider(-320, 320, s1xaxis);
 
-    //Add all the event handlers
+    Button changeToSphere1 = new Button();
+    Button changeToSphere2 = new Button();
+    Button changeToSphere3 = new Button();
+
+    changeToSphere1.setText("Sphere 1");
+    changeToSphere2.setText("Sphere 2");
+    changeToSphere3.setText("Sphere 3");
+
+    changeToSphere1.setOnAction(new EventHandler<ActionEvent>() {
+
+      @Override
+      public void handle (ActionEvent a) {
+
+        x_slider.valueProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                  s1xaxis = newValue.intValue();
+                  Render(image);
+                });
+
+      }
+    });
+
+    changeToSphere2.setOnAction(new EventHandler<ActionEvent>() {
+
+              @Override
+              public void handle (ActionEvent a) {
+
+                /*
+                x_slider.valueProperty().addListener(
+                        new ChangeListener < Number > () {
+                          public void changed(ObservableValue < ? extends Number >
+                                                      observable, Number oldValue, Number newValue) {
+                            s2xaxis = newValue.intValue();
+                            Render(image);
+                          }
+                        });
+
+
+
+                x_slider.valueProperty().removeListener(
+                        new ChangeListener < Number > () {
+                          public void changed(ObservableValue < ? extends Number >
+                                                      observable, Number oldValue, Number newValue) {
+                            s1xaxis = newValue.intValue();
+                            Render(image);
+                          }
+                        });
+
+                 */
+
+              }
+            });
+
     x_slider.valueProperty().addListener(
             new ChangeListener < Number > () {
               public void changed(ObservableValue < ? extends Number >
@@ -121,6 +176,18 @@ public class Main extends Application {
     root.add(r_slider, 0, 2);
     root.add(g_slider, 0, 3);
     root.add(b_slider, 0, 4);
+    root.add(changeToSphere1, 2, 1);
+    root.add(changeToSphere2, 2, 2);
+    root.add(changeToSphere3, 2, 3);
+
+    x_slider.setShowTickMarks(true);
+    x_slider.setShowTickLabels(true);
+    r_slider.setShowTickMarks(true);
+    r_slider.setShowTickLabels(true);
+    g_slider.setShowTickMarks(true);
+    g_slider.setShowTickLabels(true);
+    b_slider.setShowTickMarks(true);
+    b_slider.setShowTickLabels(true);
 
     //Display to user
     Scene scene = new Scene(root, 1024, 768);
@@ -147,8 +214,7 @@ public class Main extends Application {
     double gc = green_col / 255.0;
     double bc = blue_col / 255.0;
 
-
-    Vector light = new Vector(0,100,-400);
+    Vector light = new Vector(0,300,-400);
 
     Vector sphere_col = new Vector(rc,gc,bc);
     ArrayList<Sphere> sphereArray = new ArrayList<>();
@@ -172,9 +238,11 @@ public class Main extends Application {
 
     //col
     Vector bg_col = new Vector(0.5,0.5,0.5);
+
     for (j = 0; j < h; j++) {
       for (i = 0; i < w; i++) {
-        o =  new Vector(i-w/2, j-h/2, -400);
+        o =  new Vector(i-w/2.0, j-h/2.0, -400);
+
         double currentSmallestT = 999999999;
         Sphere currentClosestSphere = new Sphere(100, new Vector(99999,99999,99999),sphere_col);
         for (int sp = 0; sp < sphereArray.size(); sp++) {
