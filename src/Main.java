@@ -175,9 +175,7 @@ public class Main extends Application {
 
     for (j = 0; j < h; j++) {
       for (i = 0; i < w; i++) {
-        o.x = i-320;
-        o.y = j-320;
-        o.z = -200;
+        o =  new Vector(i-w/2, j-h/2, -400);
         double currentSmallestT = 999999999;
         int currentIndex = 0;
         for (int sp = 0; sp < sphereArray.size(); sp++) {
