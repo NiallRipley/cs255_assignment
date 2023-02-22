@@ -35,7 +35,7 @@ public class Main extends Application {
   int s1xaxis = 0;
   int s1yaxis = 0;
   int s1zaxis = 0;
-//spehere 2
+  //spehere 2
   int s2axis = 0;
   int s2xaxis = -160;
   int s2yaxis = 160;
@@ -148,7 +148,7 @@ public class Main extends Application {
     double bc = blue_col / 255.0;
 
 
-    Vector light = new Vector(0,150,-300);
+    Vector light = new Vector(0,100,-400);
 
     Vector sphere_col = new Vector(rc,gc,bc);
     ArrayList<Sphere> sphereArray = new ArrayList<>();
@@ -172,12 +172,11 @@ public class Main extends Application {
 
     //col
     Vector bg_col = new Vector(0.5,0.5,0.5);
-
     for (j = 0; j < h; j++) {
       for (i = 0; i < w; i++) {
         o =  new Vector(i-w/2, j-h/2, -400);
         double currentSmallestT = 999999999;
-        int currentIndex = 0;
+        Sphere currentClosestSphere = new Sphere(100, new Vector(99999,99999,99999),sphere_col);
         for (int sp = 0; sp < sphereArray.size(); sp++) {
           Sphere current = sphereArray.get(sp);
           v = o.sub(current.getCentPos());
@@ -187,54 +186,29 @@ public class Main extends Application {
           double disc = Discriminant(a,b,c);
 
 
-           if (disc>= 0) { //hit sphere
+          if (disc>= 0) { //hit sphere
             t = Quadratic(a,b,c,true); // ray sphere intersection, how far along
             if (t<0) t = Quadratic(a,b,c,false);
             if (t>=0 && t<currentSmallestT) {
               currentSmallestT = t;
-              currentIndex = sp;
+              currentClosestSphere = current;
             }
           }
         }
-        if (currentSmallestT < 0) {
+        if (currentSmallestT == 999999999) {
           image_writer.setColor(i,j,Color.color(bg_col.x,bg_col.y,bg_col.z, 1.0));
         } else {
           p = o.add(d.mul(currentSmallestT)); //line
           Vector lv = light.sub(p);
           lv.normalise();
-          Vector n = p.sub(sphereArray.get(currentIndex).getCentPos());
+          Vector n = p.sub(currentClosestSphere.getCentPos());
           n.normalise();
           double dp = lv.dot(n);
           if (dp<0) dp = 0;
           if (dp>1) dp = 1;
-          image_writer.setColor(i, j, Color.color(dp*sphere_col.x, dp*sphere_col.y, dp*sphere_col.z, 1.0));
+          Vector col = currentClosestSphere.getColour().mul(dp*0.7).add(currentClosestSphere.getColour().mul(0.3));
+          image_writer.setColor(i, j, Color.color(col.x, col.y, col.z, 1.0));
         }
-
-
-        /*boolean sphereHit = false;
-        for (int q = 0; q < discArray.size(); q++) {
-          if (q>0) sphereHit = true;
-        }
-        if (!sphereHit) {
-          image_writer.setColor(i,j,Color.color(bg_col.x,bg_col.y,bg_col.z, 1.0));
-        } else { //hit sphere
-          image_writer.setColor(i,j,Color.color(sphere_col.x,sphere_col.y,sphere_col.z, 1.0));
-          t = Quadratic(a,b,c,true); // ray sphere intersection, how far along
-          if (t<0) t = Quadratic(a,b,c,false);
-          if (t<0)
-            image_writer.setColor(i,j,Color.color(bg_col.x,bg_col.y,bg_col.z, 1.0));
-          else {
-            p = o.add(d.mul(t)); //line
-            Vector lv = light.sub(p);
-            lv.normalise();
-            Vector n = p.sub(s1.getCentPos());
-            n.normalise();
-            double dp = lv.dot(n);
-            if (dp<0) dp = 0;
-            if (dp>1) dp = 1;
-            image_writer.setColor(i, j, Color.color(dp*sphere_col.x, dp*sphere_col.y, dp*sphere_col.z, 1.0));
-          }
-        }*/
       } // column loop (x-axis loop)
     } // row loop (y-axis loop)
   }

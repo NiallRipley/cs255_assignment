@@ -5,8 +5,8 @@ public class Sphere {
     private Vector colour;
 
     public Sphere(double r, Vector cs, Vector c) {
-        radius = r;
         centPos = cs;
+        radius = r;
         colour = c;
     }
 
@@ -17,4 +17,12 @@ public class Sphere {
     public Double getRadius() {
         return radius;
     }
+
+    public Double getRed() {return colour.x;}
+
+    public Double getGreen() {return colour.y;}
+
+    public Double getBlue() {return colour.z;}
+
+    public Vector getColour() {return colour;}
 }
