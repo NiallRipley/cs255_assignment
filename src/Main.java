@@ -43,7 +43,7 @@ public class Main extends Application {
   //sphere 3
   int s3xaxis = 160;
   int s3yaxis = -160;
-  int s3zaxis = -160;
+  int s3zaxis = 320;
   @Override
   public void start(Stage stage) throws FileNotFoundException {
     stage.setTitle("Ray Tracing");
