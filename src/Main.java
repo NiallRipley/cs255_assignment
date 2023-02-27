@@ -8,26 +8,20 @@ All of those functions must be written by yourself
 You may use libraries to achieve a better GUI
 */
 import java.io.FileNotFoundException;
-import java.sql.Array;
 import java.util.ArrayList;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
-import javafx.scene.SpotLight;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.PixelWriter;
-import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 
 public class Main extends Application {
   int Width = 640;
@@ -234,7 +228,6 @@ public class Main extends Application {
     //Get image dimensions, and declare loop variables
     int w = (int) image.getWidth(), h = (int) image.getHeight(), i, j;
     PixelWriter image_writer = image.getPixelWriter();
-
 
     ArrayList<Sphere> sphereArray = new ArrayList<>();
 
