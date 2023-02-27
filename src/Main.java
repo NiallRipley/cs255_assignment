@@ -157,6 +157,7 @@ public class Main extends Application {
               }
             });
 
+
     g_slider.valueProperty().addListener(
             new ChangeListener<Number>() {
               public void changed(ObservableValue<? extends Number>
