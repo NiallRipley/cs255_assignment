@@ -38,6 +38,8 @@ public class Main extends Application {
   double green = 0.5;
   double blue = 0;
 
+  double radius = 100;
+
   Sphere s1 = new Sphere(100, new Vector(0,0,0),new Vector(0.5,0.3,1));
   Sphere s2 = new Sphere(100, new Vector(-160,160,160),new Vector(0.5,0.3,1));
   Sphere s3 = new Sphere(100, new Vector(160,-160,320),new Vector(0.5,0.3,1));
@@ -63,6 +65,9 @@ public class Main extends Application {
     Slider r_slider = new Slider(0, 255, red*255);
     Slider g_slider = new Slider(0, 255, green*255);
     Slider b_slider = new Slider(0, 255, blue*255);
+
+    //radius slider
+    Slider radius_slider = new Slider(10, 200, radius);
 
     ToggleGroup toggleSpheres = new ToggleGroup();
 
@@ -138,6 +143,15 @@ public class Main extends Application {
               }
             });
 
+    radius_slider.valueProperty().addListener(
+            new ChangeListener<Number>() {
+              public void changed(ObservableValue<? extends Number>
+                                          observable, Number oldValue, Number newValue) {
+                radius = newValue.doubleValue();
+                Render(image);
+              }
+            });
+
     //for x, y and z sliders
     toggleSpheres.selectedToggleProperty().addListener(
             new ChangeListener<Toggle>() {
@@ -161,9 +175,9 @@ public class Main extends Application {
                 r_slider.setValue(selectedSphere.getRed() * 255);
                 g_slider.setValue(selectedSphere.getGreen() * 255);
                 b_slider.setValue(selectedSphere.getBlue() * 255);
+                radius_slider.setValue(selectedSphere.getRadius());
               }
             });
-
 
     //The following is in case you want to interact with the image in any way
     //e.g., for user interaction, or you can find out the pixel position for debugging
@@ -190,6 +204,8 @@ public class Main extends Application {
     root.add(g_slider, 0, 5);
     root.add(b_slider, 0, 6);
 
+    root.add(radius_slider, 0, 7);
+
     root.add(s1button, 2, 1);
     root.add(s2button, 2, 2);
     root.add(s3button, 2, 3);
@@ -207,6 +223,9 @@ public class Main extends Application {
     g_slider.setShowTickLabels(true);
     b_slider.setShowTickMarks(true);
     b_slider.setShowTickLabels(true);
+
+    radius_slider.setShowTickMarks(true);
+    radius_slider.setShowTickLabels(true);
 
     //Display to user
     Scene scene = new Scene(root, 1024, 768);
@@ -232,15 +251,12 @@ public class Main extends Application {
     ArrayList<Sphere> sphereArray = new ArrayList<>();
 
     switch (selected) {
-      case 0:
-        s1 = new Sphere(100, new Vector(x,y,z),new Vector(red,green,blue));
-        break;
-      case 1:
-        s2 = new Sphere(100, new Vector(x,y,z),new Vector(red,green,blue));
-        break;
-      case 2:
-        s3 = new Sphere(100, new Vector(x,y,z),new Vector(red,green,blue));
-        break;
+      case 0 ->
+              s1 = new Sphere(radius, new Vector(x, y, z), new Vector(red, green, blue));
+      case 1 ->
+              s2 = new Sphere(radius, new Vector(x, y, z), new Vector(red, green, blue));
+      case 2 ->
+              s3 = new Sphere(radius, new Vector(x, y, z), new Vector(red, green, blue));
     }
 
     sphereArray.add(s1);
@@ -265,9 +281,8 @@ public class Main extends Application {
         double lowestT = 999999999;
         Sphere closestSphere = null;
 
-        for (int sp = 0; sp < sphereArray.size(); sp++) {
-          Sphere currentSp = sphereArray.get(sp);
-          if (currentSp.checkIntersection(origin,direction)) {
+        for (Sphere currentSp : sphereArray) {
+          if (currentSp.checkIntersection(origin, direction)) {
             double intersectionPoint = currentSp.findIntersection(origin, direction);
             if (intersectionPoint >= 0 && intersectionPoint < lowestT) {
               closestSphere = currentSp;
