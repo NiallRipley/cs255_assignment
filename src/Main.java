@@ -7,12 +7,9 @@ Do not use JavaFX functions or other libraries to do the main parts of the assig
 All of those functions must be written by yourself
 You may use libraries to achieve a better GUI
 */
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
@@ -46,7 +43,7 @@ public class Main extends Application {
 
 
   @Override
-  public void start(Stage stage) throws FileNotFoundException {
+  public void start(Stage stage) {
     stage.setTitle("Ray Tracing");
 
     //We need 3 things to see an image
@@ -90,93 +87,69 @@ public class Main extends Application {
 
 
     x_slider.valueProperty().addListener(
-            new ChangeListener<Number>() {
-              public void changed(ObservableValue<? extends Number>
-                                          observable, Number oldValue, Number newValue) {
-                x = newValue.doubleValue();
-                Render(image);
-              }
+            (observable, oldValue, newValue) -> {
+              x = newValue.doubleValue();
+              Render(image);
             });
 
     y_slider.valueProperty().addListener(
-            new ChangeListener<Number>() {
-              public void changed(ObservableValue<? extends Number>
-                                          observable, Number oldValue, Number newValue) {
-                y = newValue.doubleValue();
-                Render(image);
-              }
+            (observable, oldValue, newValue) -> {
+              y = newValue.doubleValue();
+              Render(image);
             });
 
     z_slider.valueProperty().addListener(
-            new ChangeListener<Number>() {
-              public void changed(ObservableValue<? extends Number>
-                                          observable, Number oldValue, Number newValue) {
-                z = newValue.doubleValue();
-                Render(image);
-              }
+            (observable, oldValue, newValue) -> {
+              z = newValue.doubleValue();
+              Render(image);
             });
 
     r_slider.valueProperty().addListener(
-            new ChangeListener<Number>() {
-              public void changed(ObservableValue<? extends Number>
-                                          observable, Number oldValue, Number newValue) {
-                red = newValue.doubleValue() / 255;
-                Render(image);
-              }
+            (observable, oldValue, newValue) -> {
+              red = newValue.doubleValue() / 255;
+              Render(image);
             });
 
     g_slider.valueProperty().addListener(
-            new ChangeListener<Number>() {
-              public void changed(ObservableValue<? extends Number>
-                                          observable, Number oldValue, Number newValue) {
-                green = newValue.doubleValue() / 255;
-                Render(image);
-              }
+            (observable, oldValue, newValue) -> {
+              green = newValue.doubleValue() / 255;
+              Render(image);
             });
 
     b_slider.valueProperty().addListener(
-            new ChangeListener<Number>() {
-              public void changed(ObservableValue<? extends Number>
-                                          observable, Number oldValue, Number newValue) {
-                blue = newValue.doubleValue() / 255;
-                Render(image);
-              }
+            (observable, oldValue, newValue) -> {
+              blue = newValue.doubleValue() / 255;
+              Render(image);
             });
 
     radius_slider.valueProperty().addListener(
-            new ChangeListener<Number>() {
-              public void changed(ObservableValue<? extends Number>
-                                          observable, Number oldValue, Number newValue) {
-                radius = newValue.doubleValue();
-                Render(image);
-              }
+            (observable, oldValue, newValue) -> {
+              radius = newValue.doubleValue();
+              Render(image);
             });
 
     //for x, y and z sliders
     toggleSpheres.selectedToggleProperty().addListener(
-            new ChangeListener<Toggle>() {
-              public void changed(ObservableValue<? extends Toggle> ov,
-                                  Toggle old_toggle, Toggle new_toggle) {
-                if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 1") {
-                  selectedSphere = s1;
-                  selected = 0;
-                } else if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 2") {
-                  selectedSphere = s2;
-                  selected = 1;
-                } else if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 3") {
-                  selectedSphere = s3;
-                  selected = 2;
-                } else {
-                  System.out.println("Error while changing spheres");
-                }
-                x_slider.setValue(selectedSphere.getCentPos().getX());
-                y_slider.setValue(selectedSphere.getCentPos().getY());
-                z_slider.setValue(selectedSphere.getCentPos().getZ());
-                r_slider.setValue(selectedSphere.getRed() * 255);
-                g_slider.setValue(selectedSphere.getGreen() * 255);
-                b_slider.setValue(selectedSphere.getBlue() * 255);
-                radius_slider.setValue(selectedSphere.getRadius());
+            (ov, old_toggle, new_toggle) -> {
+              if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 1") {
+                selectedSphere = s1;
+                selected = 0;
+              } else if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 2") {
+                selectedSphere = s2;
+                selected = 1;
+              } else if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 3") {
+                selectedSphere = s3;
+                selected = 2;
+              } else {
+                System.out.println("Error while changing spheres");
               }
+              x_slider.setValue(selectedSphere.getCentPos().getX());
+              y_slider.setValue(selectedSphere.getCentPos().getY());
+              z_slider.setValue(selectedSphere.getCentPos().getZ());
+              r_slider.setValue(selectedSphere.getRed() * 255);
+              g_slider.setValue(selectedSphere.getGreen() * 255);
+              b_slider.setValue(selectedSphere.getBlue() * 255);
+              radius_slider.setValue(selectedSphere.getRadius());
             });
 
     //The following is in case you want to interact with the image in any way
@@ -233,16 +206,6 @@ public class Main extends Application {
     stage.show();
   }
 
-  public double Discriminant(double a, double b, double c) {
-    return b*b-4*a*c;
-  }
-
-  public double Quadratic(double a,double b,double c, Boolean close) {
-    double disc = Discriminant(a,b,c);
-    if (close) return (-b-Math.sqrt(disc))/(2*a);
-    else return (-b+Math.sqrt(disc))/(2*a);
-  }
-
   public void Render(WritableImage image) {
     //Get image dimensions, and declare loop variables
     int w = (int) image.getWidth(), h = (int) image.getHeight(), i, j;
@@ -266,7 +229,7 @@ public class Main extends Application {
     Vector light = new Vector(0,300,-400);
 
 
-    Vector origin = new Vector(0,0,0); //origin of ray
+    Vector origin;
     Vector direction = new Vector(0,0,1); //direction of ray
     Vector p; //3D points
 
@@ -276,7 +239,7 @@ public class Main extends Application {
     for (j = 0; j < h; j++) {
       for (i = 0; i < w; i++) {
 
-        origin =  new Vector(i-w/2, j-h/2, -400);
+        origin =  new Vector(i-w/2.0, j-h/2.0, -400);
         boolean hasIntersected = false;
         double lowestT = 999999999;
         Sphere closestSphere = null;
