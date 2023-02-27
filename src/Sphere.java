@@ -1,8 +1,8 @@
 public class Sphere {
 
-    private double radius;
-    private Vector centPos;
-    private Vector colour;
+    private final double radius;
+    private final Vector centPos;
+    private final Vector colour;
 
     public Sphere(double r, Vector cs, Vector c) {
         centPos = cs;
