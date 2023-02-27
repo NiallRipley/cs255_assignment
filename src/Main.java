@@ -38,7 +38,7 @@ public class Main extends Application {
   int blue_col = 255;
 
   //sphere 1
-  int s1xaxis = 0;
+  /*int s1xaxis = 0;
   int s1yaxis = 0;
   int s1zaxis = 0;
   //sphere 2
@@ -48,7 +48,23 @@ public class Main extends Application {
   //sphere 3
   int s3xaxis = 160;
   int s3yaxis = -160;
-  int s3zaxis = 320;
+  int s3zaxis = 320; */
+
+  int selected = 0;
+  Sphere selectedSphere;
+
+  double x = 0;
+  double y = 0;
+  double z = 0;
+
+  double red = 0.3;
+  double green = 0.5;
+  double blue = 0;
+
+  Sphere s1 = new Sphere(100, new Vector(0,0,0),new Vector(0.5,0.3,1));
+  Sphere s2 = new Sphere(100, new Vector(-160,160,160),new Vector(0.5,0.3,1));
+  Sphere s3 = new Sphere(100, new Vector(160,-160,320),new Vector(0.5,0.3,1));
+
 
   @Override
   public void start(Stage stage) throws FileNotFoundException {
@@ -67,9 +83,9 @@ public class Main extends Application {
     Slider z_slider = new Slider(-320, 320, 0);
 
     //Create the simple GUI
-    Slider r_slider = new Slider(0, 255, red_col);
-    Slider g_slider = new Slider(0, 255, green_col);
-    Slider b_slider = new Slider(0, 255, blue_col);
+    Slider r_slider = new Slider(0, 255, red*255);
+    Slider g_slider = new Slider(0, 255, green*255);
+    Slider b_slider = new Slider(0, 255, blue*255);
 
     ToggleGroup toggleSpheres = new ToggleGroup();
 
@@ -103,11 +119,58 @@ public class Main extends Application {
 
      */
 
+
+
     x_slider.valueProperty().addListener(
             new ChangeListener<Number>() {
               public void changed(ObservableValue<? extends Number>
                                           observable, Number oldValue, Number newValue) {
-                s1xaxis = newValue.intValue();
+                x = newValue.doubleValue();
+                Render(image);
+              }
+            });
+
+    y_slider.valueProperty().addListener(
+            new ChangeListener<Number>() {
+              public void changed(ObservableValue<? extends Number>
+                                          observable, Number oldValue, Number newValue) {
+                y = newValue.doubleValue();
+                Render(image);
+              }
+            });
+
+    z_slider.valueProperty().addListener(
+            new ChangeListener<Number>() {
+              public void changed(ObservableValue<? extends Number>
+                                          observable, Number oldValue, Number newValue) {
+                z = newValue.doubleValue();
+                Render(image);
+              }
+            });
+
+    r_slider.valueProperty().addListener(
+            new ChangeListener<Number>() {
+              public void changed(ObservableValue<? extends Number>
+                                          observable, Number oldValue, Number newValue) {
+                red = newValue.doubleValue() / 255;
+                Render(image);
+              }
+            });
+
+    g_slider.valueProperty().addListener(
+            new ChangeListener<Number>() {
+              public void changed(ObservableValue<? extends Number>
+                                          observable, Number oldValue, Number newValue) {
+                green = newValue.doubleValue() / 255;
+                Render(image);
+              }
+            });
+
+    b_slider.valueProperty().addListener(
+            new ChangeListener<Number>() {
+              public void changed(ObservableValue<? extends Number>
+                                          observable, Number oldValue, Number newValue) {
+                blue = newValue.doubleValue() / 255;
                 Render(image);
               }
             });
@@ -115,80 +178,28 @@ public class Main extends Application {
     //for x, y and z sliders
     toggleSpheres.selectedToggleProperty().addListener(
             new ChangeListener<Toggle>() {
-      public void changed(ObservableValue<? extends Toggle> ov,
-                          Toggle old_toggle, Toggle new_toggle) {
-        if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 1") {
-          x_slider.setValue(s1xaxis);
-          y_slider.setValue(s1yaxis);
-          z_slider.setValue(s1zaxis);
-        } else if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 2") {
-          x_slider.setValue(s2xaxis);
-          y_slider.setValue(s2yaxis);
-          z_slider.setValue(s2zaxis);
-        } else if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 3") {
-          x_slider.setValue(s3xaxis);
-          y_slider.setValue(s2yaxis);
-          z_slider.setValue(s2zaxis);
-        } else {
-          System.out.println("Error while changing spheres");
-        }
-      }
-    });
-
-    /*
-    //for red, green and blue sliders
-    toggleSpheres.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
-      public void changed(ObservableValue<? extends Toggle> ov,
-                          Toggle old_toggle, Toggle new_toggle) {
-        if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 1") {
-          r_slider.setValue(s1xaxis);
-          g_slider.setValue(s1xaxis);
-          b_slider.setValue(s1xaxis);
-        } else if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 2") {
-          r_slider.setValue(s1xaxis);
-          g_slider.setValue(s1xaxis);
-          b_slider.setValue(s1xaxis);
-        } else if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 3") {
-          r_slider.setValue(s3xaxis);
-          g_slider.setValue(s1xaxis);
-          b_slider.setValue(s1xaxis);
-        }
-      }
-    });
-
-    /*
-
-    r_slider.valueProperty().addListener(
-            new ChangeListener < Number > () {
-              public void changed(ObservableValue < ? extends Number >
-                                          observable, Number oldValue, Number newValue) {
-                red_col = newValue.intValue();
-                Render(image);
+              public void changed(ObservableValue<? extends Toggle> ov,
+                                  Toggle old_toggle, Toggle new_toggle) {
+                if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 1") {
+                  selectedSphere = s1;
+                  selected = 0;
+                } else if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 2") {
+                  selectedSphere = s2;
+                  selected = 1;
+                } else if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 3") {
+                  selectedSphere = s3;
+                  selected = 2;
+                } else {
+                  System.out.println("Error while changing spheres");
+                }
+                x_slider.setValue(selectedSphere.getCentPos().getX());
+                y_slider.setValue(selectedSphere.getCentPos().getY());
+                z_slider.setValue(selectedSphere.getCentPos().getZ());
+                r_slider.setValue(selectedSphere.getRed() * 255);
+                g_slider.setValue(selectedSphere.getGreen() * 255);
+                b_slider.setValue(selectedSphere.getBlue() * 255);
               }
             });
-
-
-    g_slider.valueProperty().addListener(
-            new ChangeListener < Number > () {
-              public void changed(ObservableValue < ? extends Number >
-                                          observable, Number oldValue, Number newValue) {
-                green_col = newValue.intValue();
-                Render(image);
-              }
-            });
-
-    b_slider.valueProperty().addListener(
-            new ChangeListener < Number > () {
-              public void changed(ObservableValue < ? extends Number >
-                                          observable, Number oldValue, Number newValue) {
-                blue_col = newValue.intValue();
-                Render(image);
-              }
-            });
-
-     */
-
-
 
 
     //The following is in case you want to interact with the image in any way
@@ -263,9 +274,17 @@ public class Main extends Application {
 
     ArrayList<Sphere> sphereArray = new ArrayList<>();
 
-    Sphere s1 = new Sphere(100, new Vector(s1xaxis,s1yaxis,s1zaxis),sphere_col);
-    Sphere s2 = new Sphere(100, new Vector(s2xaxis,s2yaxis,s2zaxis),sphere_col);
-    Sphere s3 = new Sphere(100, new Vector(s3xaxis,s3yaxis,s3zaxis),sphere_col);
+    switch (selected) {
+      case 0:
+        s1 = new Sphere(100, new Vector(x,y,z),new Vector(red,green,blue));
+        break;
+      case 1:
+        s2 = new Sphere(100, new Vector(x,y,z),new Vector(red,green,blue));
+        break;
+      case 2:
+        s3 = new Sphere(100, new Vector(x,y,z),new Vector(red,green,blue));
+        break;
+    }
 
     sphereArray.add(s1);
     sphereArray.add(s2);
@@ -290,7 +309,7 @@ public class Main extends Application {
       for (i = 0; i < w; i++) {
 
 
-         Vector o =  new Vector(i-w/2.0, j-h/2.0, -400);
+        Vector o =  new Vector(i-w/2.0, j-h/2.0, -400);
 
         double currentSmallestT = 999999999;
         Sphere currentClosestSphere = new Sphere(100, new Vector(99999,99999,99999),sphere_col);
@@ -301,11 +320,11 @@ public class Main extends Application {
         Sphere closestSphere = new Sphere(100, new Vector(99999,99999,99999),sphere_col);
 
         for (int sp = 0; sp < sphereArray.size(); sp++) {
-          Sphere current = sphereArray.get(sp);
-          if (current.checkIntersection(origin,direction)) {
-            double intersectionPoint = current.findIntersection(origin, direction);
+          Sphere currentSp = sphereArray.get(sp);
+          if (currentSp.checkIntersection(origin,direction)) {
+            double intersectionPoint = currentSp.findIntersection(origin, direction);
             if (intersectionPoint >= 0 && intersectionPoint < lowestT) {
-              closestSphere = current;
+              closestSphere = currentSp;
               lowestT = intersectionPoint;
               hasIntersected = true;
             }

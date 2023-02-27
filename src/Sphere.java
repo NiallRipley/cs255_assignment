@@ -55,4 +55,6 @@ public class Sphere {
     public Double getBlue() {return colour.z;}
 
     public Vector getColour() {return colour;}
+
+
 }
