@@ -15,13 +15,16 @@ import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
+import javafx.scene.SpotLight;
+import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.control.Slider;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.PixelWriter;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -38,8 +41,7 @@ public class Main extends Application {
   int s1xaxis = 0;
   int s1yaxis = 0;
   int s1zaxis = 0;
-  //spehere 2
-  int s2axis = 0;
+  //sphere 2
   int s2xaxis = -160;
   int s2yaxis = 160;
   int s2zaxis = 160;
@@ -47,6 +49,7 @@ public class Main extends Application {
   int s3xaxis = 160;
   int s3yaxis = -160;
   int s3zaxis = 320;
+
   @Override
   public void start(Stage stage) throws FileNotFoundException {
     stage.setTitle("Ray Tracing");
@@ -58,66 +61,37 @@ public class Main extends Application {
     ImageView view = new ImageView(image);
     //3. Add to the pane (below)
 
+    //all values are related to middle sphere (s1)
+    Slider x_slider = new Slider(-320, 320, 0);
+    Slider y_slider = new Slider(-320, 320, 0);
+    Slider z_slider = new Slider(-320, 320, 0);
+
     //Create the simple GUI
     Slider r_slider = new Slider(0, 255, red_col);
     Slider g_slider = new Slider(0, 255, green_col);
     Slider b_slider = new Slider(0, 255, blue_col);
 
-    Slider x_slider = new Slider(-320, 320, s1xaxis);
+    ToggleGroup toggleSpheres = new ToggleGroup();
 
-    Button changeToSphere1 = new Button();
-    Button changeToSphere2 = new Button();
-    Button changeToSphere3 = new Button();
+    RadioButton s1button = new RadioButton();
+    s1button.setToggleGroup(toggleSpheres);
+    s1button.setSelected(true);
+    s1button.setUserData("Sphere 1");
 
-    changeToSphere1.setText("Sphere 1");
-    changeToSphere2.setText("Sphere 2");
-    changeToSphere3.setText("Sphere 3");
+    RadioButton s2button = new RadioButton();
+    s2button.setToggleGroup(toggleSpheres);
+    s2button.setUserData("Sphere 2");
 
-    changeToSphere1.setOnAction(new EventHandler<ActionEvent>() {
+    RadioButton s3button = new RadioButton();
+    s3button.setToggleGroup(toggleSpheres);
+    s3button.setUserData("Sphere 3");
 
-      @Override
-      public void handle (ActionEvent a) {
-
-        x_slider.valueProperty().addListener(
-                (observable, oldValue, newValue) -> {
-                  s1xaxis = newValue.intValue();
-                  Render(image);
-                });
-
-      }
-    });
-
-    changeToSphere2.setOnAction(new EventHandler<ActionEvent>() {
-
-              @Override
-              public void handle (ActionEvent a) {
-
-                /*
-                x_slider.valueProperty().addListener(
-                        new ChangeListener < Number > () {
-                          public void changed(ObservableValue < ? extends Number >
-                                                      observable, Number oldValue, Number newValue) {
-                            s2xaxis = newValue.intValue();
-                            Render(image);
-                          }
-                        });
+    s1button.setText("Sphere 1");
+    s2button.setText("Sphere 2");
+    s3button.setText("Sphere 3");
 
 
-
-                x_slider.valueProperty().removeListener(
-                        new ChangeListener < Number > () {
-                          public void changed(ObservableValue < ? extends Number >
-                                                      observable, Number oldValue, Number newValue) {
-                            s1xaxis = newValue.intValue();
-                            Render(image);
-                          }
-                        });
-
-                 */
-
-              }
-            });
-
+    /*
     x_slider.valueProperty().addListener(
             new ChangeListener < Number > () {
               public void changed(ObservableValue < ? extends Number >
@@ -126,6 +100,63 @@ public class Main extends Application {
                 Render(image);
               }
             });
+
+     */
+
+    x_slider.valueProperty().addListener(
+            new ChangeListener<Number>() {
+              public void changed(ObservableValue<? extends Number>
+                                          observable, Number oldValue, Number newValue) {
+                s1xaxis = newValue.intValue();
+                Render(image);
+              }
+            });
+
+    //for x, y and z sliders
+    toggleSpheres.selectedToggleProperty().addListener(
+            new ChangeListener<Toggle>() {
+      public void changed(ObservableValue<? extends Toggle> ov,
+                          Toggle old_toggle, Toggle new_toggle) {
+        if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 1") {
+          x_slider.setValue(s1xaxis);
+          y_slider.setValue(s1yaxis);
+          z_slider.setValue(s1zaxis);
+        } else if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 2") {
+          x_slider.setValue(s2xaxis);
+          y_slider.setValue(s2yaxis);
+          z_slider.setValue(s2zaxis);
+        } else if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 3") {
+          x_slider.setValue(s3xaxis);
+          y_slider.setValue(s2yaxis);
+          z_slider.setValue(s2zaxis);
+        } else {
+          System.out.println("Error while changing spheres");
+        }
+      }
+    });
+
+    /*
+    //for red, green and blue sliders
+    toggleSpheres.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+      public void changed(ObservableValue<? extends Toggle> ov,
+                          Toggle old_toggle, Toggle new_toggle) {
+        if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 1") {
+          r_slider.setValue(s1xaxis);
+          g_slider.setValue(s1xaxis);
+          b_slider.setValue(s1xaxis);
+        } else if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 2") {
+          r_slider.setValue(s1xaxis);
+          g_slider.setValue(s1xaxis);
+          b_slider.setValue(s1xaxis);
+        } else if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 3") {
+          r_slider.setValue(s3xaxis);
+          g_slider.setValue(s1xaxis);
+          b_slider.setValue(s1xaxis);
+        }
+      }
+    });
+
+    /*
 
     r_slider.valueProperty().addListener(
             new ChangeListener < Number > () {
@@ -155,10 +186,14 @@ public class Main extends Application {
               }
             });
 
+     */
+
+
+
 
     //The following is in case you want to interact with the image in any way
     //e.g., for user interaction, or you can find out the pixel position for debugging
-    view.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
+    view.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
       System.out.println(event.getX() + " " + event.getY());
       event.consume();
     });
@@ -171,17 +206,27 @@ public class Main extends Application {
 
     //3. (referring to the 3 things we need to display an image)
     //we need to add it to the pane
+
     root.add(view, 0, 0);
     root.add(x_slider, 0, 1);
-    root.add(r_slider, 0, 2);
-    root.add(g_slider, 0, 3);
-    root.add(b_slider, 0, 4);
-    root.add(changeToSphere1, 2, 1);
-    root.add(changeToSphere2, 2, 2);
-    root.add(changeToSphere3, 2, 3);
+    root.add(y_slider, 0, 2);
+    root.add(z_slider, 0, 3);
+
+    root.add(r_slider, 0, 4);
+    root.add(g_slider, 0, 5);
+    root.add(b_slider, 0, 6);
+
+    root.add(s1button, 2, 1);
+    root.add(s2button, 2, 2);
+    root.add(s3button, 2, 3);
 
     x_slider.setShowTickMarks(true);
     x_slider.setShowTickLabels(true);
+    y_slider.setShowTickMarks(true);
+    y_slider.setShowTickLabels(true);
+    z_slider.setShowTickMarks(true);
+    z_slider.setShowTickLabels(true);
+
     r_slider.setShowTickMarks(true);
     r_slider.setShowTickLabels(true);
     g_slider.setShowTickMarks(true);
@@ -214,10 +259,10 @@ public class Main extends Application {
     double gc = green_col / 255.0;
     double bc = blue_col / 255.0;
 
-    Vector light = new Vector(0,300,-400);
-
     Vector sphere_col = new Vector(rc,gc,bc);
+
     ArrayList<Sphere> sphereArray = new ArrayList<>();
+
     Sphere s1 = new Sphere(100, new Vector(s1xaxis,s1yaxis,s1zaxis),sphere_col);
     Sphere s2 = new Sphere(100, new Vector(s2xaxis,s2yaxis,s2zaxis),sphere_col);
     Sphere s3 = new Sphere(100, new Vector(s3xaxis,s3yaxis,s3zaxis),sphere_col);
@@ -225,6 +270,8 @@ public class Main extends Application {
     sphereArray.add(s1);
     sphereArray.add(s2);
     sphereArray.add(s3);
+
+    Vector light = new Vector(0,300,-400);
 
 
     Vector origin = new Vector(0,0,0); //origin of ray
@@ -242,7 +289,8 @@ public class Main extends Application {
     for (j = 0; j < h; j++) {
       for (i = 0; i < w; i++) {
 
-        o =  new Vector(i-w/2.0, j-h/2.0, -400);
+
+         Vector o =  new Vector(i-w/2.0, j-h/2.0, -400);
 
         double currentSmallestT = 999999999;
         Sphere currentClosestSphere = new Sphere(100, new Vector(99999,99999,99999),sphere_col);
