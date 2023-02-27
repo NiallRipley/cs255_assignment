@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.skin.TextInputControlSkin;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.image.ImageView;
@@ -233,13 +234,29 @@ public class Main extends Application {
     Vector direction = new Vector(0,0,1); //direction of ray
     Vector p; //3D points
 
+    Vector VRP = new Vector(0,0,400); //Centre of the image plane
+    Vector VUV = new Vector(0,1,0); //Up direction of the camera
+    Vector lookAt = new Vector(0,0,0); //Point defining where the camera is pointing
+    Vector VPN = lookAt.sub(VRP); //Direction the camera is looking
+    VPN.normalise();
+    Vector VRV = VPN.cross(VUV); //Right direction of the camera
+    VRV.normalise();
+    VUV = VRV.cross(VPN);
+    VUV.normalise();
+
+    double scale = 1;
+
     //col
     Vector bg_col = new Vector(0.5,0.5,0.5);
 
     for (j = 0; j < h; j++) {
       for (i = 0; i < w; i++) {
-
-        origin =  new Vector(i-w/2.0, j-h/2.0, -400);
+        double u = (i-(w/2))*scale;
+        double v = ((h-j)-h/2)*scale;
+        origin =  new Vector(0, 0, -400);
+        direction = VRP.add(VRV.mul(u)).add(VUV.mul(v));
+        //direction.print();
+        //origin =  new Vector(i-w/2.0, j-h/2.0, -600);
         boolean hasIntersected = false;
         double lowestT = 999999999;
         Sphere closestSphere = null;
