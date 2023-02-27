@@ -33,23 +33,6 @@ public class Main extends Application {
   int Width = 640;
   int Height = 640;
 
-  int red_col = 255;
-  int green_col = 255; //just for the test example
-  int blue_col = 255;
-
-  //sphere 1
-  /*int s1xaxis = 0;
-  int s1yaxis = 0;
-  int s1zaxis = 0;
-  //sphere 2
-  int s2xaxis = -160;
-  int s2yaxis = 160;
-  int s2zaxis = 160;
-  //sphere 3
-  int s3xaxis = 160;
-  int s3yaxis = -160;
-  int s3zaxis = 320; */
-
   int selected = 0;
   Sphere selectedSphere;
 
@@ -107,20 +90,6 @@ public class Main extends Application {
     s3button.setText("Sphere 3");
 
 
-    /*
-    x_slider.valueProperty().addListener(
-            new ChangeListener < Number > () {
-              public void changed(ObservableValue < ? extends Number >
-                                          observable, Number oldValue, Number newValue) {
-                s1xaxis = newValue.intValue();
-                Render(image);
-              }
-            });
-
-     */
-
-
-
     x_slider.valueProperty().addListener(
             new ChangeListener<Number>() {
               public void changed(ObservableValue<? extends Number>
@@ -156,7 +125,6 @@ public class Main extends Application {
                 Render(image);
               }
             });
-
 
     g_slider.valueProperty().addListener(
             new ChangeListener<Number>() {
@@ -267,11 +235,6 @@ public class Main extends Application {
     int w = (int) image.getWidth(), h = (int) image.getHeight(), i, j;
     PixelWriter image_writer = image.getPixelWriter();
 
-    double rc = red_col / 255.0;
-    double gc = green_col / 255.0;
-    double bc = blue_col / 255.0;
-
-    Vector sphere_col = new Vector(rc,gc,bc);
 
     ArrayList<Sphere> sphereArray = new ArrayList<>();
 
@@ -296,12 +259,7 @@ public class Main extends Application {
 
     Vector origin = new Vector(0,0,0); //origin of ray
     Vector direction = new Vector(0,0,1); //direction of ray
-    //Vector cs = new Vector(0,0,0); //centre of sphere
-    //double r = 100; //radius of sphere
     Vector p; //3D points
-    double t; // solution, where on the line it intersects the sphere
-    double a, b;
-    Vector v;
 
     //col
     Vector bg_col = new Vector(0.5,0.5,0.5);
@@ -309,16 +267,10 @@ public class Main extends Application {
     for (j = 0; j < h; j++) {
       for (i = 0; i < w; i++) {
 
-
-        Vector o =  new Vector(i-w/2.0, j-h/2.0, -400);
-
-        double currentSmallestT = 999999999;
-        Sphere currentClosestSphere = new Sphere(100, new Vector(99999,99999,99999),sphere_col);
-
         origin =  new Vector(i-w/2, j-h/2, -400);
         boolean hasIntersected = false;
         double lowestT = 999999999;
-        Sphere closestSphere = new Sphere(100, new Vector(99999,99999,99999),sphere_col);
+        Sphere closestSphere = null;
 
         for (int sp = 0; sp < sphereArray.size(); sp++) {
           Sphere currentSp = sphereArray.get(sp);
