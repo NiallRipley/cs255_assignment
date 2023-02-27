@@ -227,8 +227,8 @@ public class Main extends Application {
     sphereArray.add(s3);
 
 
-    Vector o = new Vector(0,0,0); //origin of ray
-    Vector d = new Vector(0,0,1); //direction of ray
+    Vector origin = new Vector(0,0,0); //origin of ray
+    Vector direction = new Vector(0,0,1); //direction of ray
     //Vector cs = new Vector(0,0,0); //centre of sphere
     //double r = 100; //radius of sphere
     Vector p; //3D points
@@ -241,40 +241,41 @@ public class Main extends Application {
 
     for (j = 0; j < h; j++) {
       for (i = 0; i < w; i++) {
+
         o =  new Vector(i-w/2.0, j-h/2.0, -400);
 
         double currentSmallestT = 999999999;
         Sphere currentClosestSphere = new Sphere(100, new Vector(99999,99999,99999),sphere_col);
+
+        origin =  new Vector(i-w/2, j-h/2, -400);
+        boolean hasIntersected = false;
+        double lowestT = 999999999;
+        Sphere closestSphere = new Sphere(100, new Vector(99999,99999,99999),sphere_col);
+
         for (int sp = 0; sp < sphereArray.size(); sp++) {
           Sphere current = sphereArray.get(sp);
-          v = o.sub(current.getCentPos());
-          a = d.dot(d);
-          b = 2*v.dot(d);
-          double c = v.dot(v) - current.getRadius()*current.getRadius();
-          double disc = Discriminant(a,b,c);
-
-
-          if (disc>= 0) { //hit sphere
-            t = Quadratic(a,b,c,true); // ray sphere intersection, how far along
-            if (t<0) t = Quadratic(a,b,c,false);
-            if (t>=0 && t<currentSmallestT) {
-              currentSmallestT = t;
-              currentClosestSphere = current;
+          if (current.checkIntersection(origin,direction)) {
+            double intersectionPoint = current.findIntersection(origin, direction);
+            if (intersectionPoint >= 0 && intersectionPoint < lowestT) {
+              closestSphere = current;
+              lowestT = intersectionPoint;
+              hasIntersected = true;
             }
           }
         }
-        if (currentSmallestT == 999999999) {
+
+        if (!hasIntersected) {
           image_writer.setColor(i,j,Color.color(bg_col.x,bg_col.y,bg_col.z, 1.0));
         } else {
-          p = o.add(d.mul(currentSmallestT)); //line
+          p = origin.add(direction.mul(closestSphere.findIntersection(origin,direction))); //line
           Vector lv = light.sub(p);
           lv.normalise();
-          Vector n = p.sub(currentClosestSphere.getCentPos());
+          Vector n = p.sub(closestSphere.getCentPos());
           n.normalise();
           double dp = lv.dot(n);
           if (dp<0) dp = 0;
           if (dp>1) dp = 1;
-          Vector col = currentClosestSphere.getColour().mul(dp*0.7).add(currentClosestSphere.getColour().mul(0.3));
+          Vector col = closestSphere.getColour().mul(dp*0.7).add(closestSphere.getColour().mul(0.3));
           image_writer.setColor(i, j, Color.color(col.x, col.y, col.z, 1.0));
         }
       } // column loop (x-axis loop)
