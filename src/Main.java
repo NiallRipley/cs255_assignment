@@ -10,15 +10,20 @@ You may use libraries to achieve a better GUI
 import java.util.ArrayList;
 
 import javafx.application.Application;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.skin.TextInputControlSkin;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.PixelWriter;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -86,6 +91,8 @@ public class Main extends Application {
     s2button.setText("Sphere 2");
     s3button.setText("Sphere 3");
 
+    ScrollPane scroll = new ScrollPane();
+    scroll.setContent(view);
 
     x_slider.valueProperty().addListener(
             (observable, oldValue, newValue) -> {
@@ -166,11 +173,20 @@ public class Main extends Application {
     root.setVgap(12);
     root.setHgap(12);
 
+    root.setAlignment(Pos.CENTER);
+
+    //needs tweaking
+    Label label = new Label("X Slider");
+    HBox hbox = new HBox(label, x_slider);
+    hbox.setMinWidth(Width);
+    hbox.setMaxWidth(Width);
+
     //3. (referring to the 3 things we need to display an image)
     //we need to add it to the pane
 
-    root.add(view, 0, 0);
-    root.add(x_slider, 0, 1);
+    root.add(view, 0, 0);;
+    root.add(hbox, 0, 1);
+    //root.add(x_slider, 0, 1);
     root.add(y_slider, 0, 2);
     root.add(z_slider, 0, 3);
 
@@ -179,6 +195,8 @@ public class Main extends Application {
     root.add(b_slider, 0, 6);
 
     root.add(radius_slider, 0, 7);
+
+    root.getChildren().addAll(scroll);
 
     root.add(s1button, 2, 1);
     root.add(s2button, 2, 2);
