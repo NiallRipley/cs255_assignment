@@ -43,6 +43,8 @@ public class Main extends Application {
 
   double radius = 100;
 
+  double cameraRotation = 0;
+
   Sphere s1 = new Sphere(100, new Vector(0,0,0),new Vector(0.5,0.3,1));
   Sphere s2 = new Sphere(100, new Vector(-160,160,160),new Vector(0.5,0.3,1));
   Sphere s3 = new Sphere(100, new Vector(160,-160,320),new Vector(0.5,0.3,1));
@@ -71,6 +73,8 @@ public class Main extends Application {
 
     //radius slider
     Slider radius_slider = new Slider(10, 200, radius);
+
+    Slider camera_slider = new Slider(0, 360, cameraRotation);
 
     ToggleGroup toggleSpheres = new ToggleGroup();
 
@@ -136,6 +140,12 @@ public class Main extends Application {
               Render(image);
             });
 
+    camera_slider.valueProperty().addListener(
+            (observable, oldValue, newValue) -> {
+              cameraRotation = newValue.doubleValue();
+              Render(image);
+            });
+
     //for x, y and z sliders
     toggleSpheres.selectedToggleProperty().addListener(
             (ov, old_toggle, new_toggle) -> {
@@ -196,6 +206,8 @@ public class Main extends Application {
 
     root.add(radius_slider, 0, 7);
 
+    root.add(camera_slider, 0, 8);
+
     root.getChildren().addAll(scroll);
 
     root.add(s1button, 2, 1);
@@ -218,6 +230,9 @@ public class Main extends Application {
 
     radius_slider.setShowTickMarks(true);
     radius_slider.setShowTickLabels(true);
+
+    camera_slider.setShowTickMarks(true);
+    camera_slider.setShowTickLabels(true);
 
     //Display to user
     Scene scene = new Scene(root, 1024, 768);
@@ -252,17 +267,24 @@ public class Main extends Application {
     Vector direction = new Vector(0,0,1); //direction of ray
     Vector p; //3D points
 
-    Vector VRP = new Vector(0,0,400); //Centre of the image plane
-    Vector VUV = new Vector(0,1,0); //Up direction of the camera
+    double cameraRotationScale = cameraRotation/360;
+    System.out.println(cameraRotationScale);
+
+    //Perspective camera
+    Vector VRP = new Vector(400*(1-cameraRotationScale),0,400*cameraRotationScale); //Centre of the image plane
+    Vector VUV = new Vector(0,1,0); //Approx up direction of the camera
     Vector lookAt = new Vector(0,0,0); //Point defining where the camera is pointing
     Vector VPN = lookAt.sub(VRP); //Direction the camera is looking
     VPN.normalise();
     Vector VRV = VPN.cross(VUV); //Right direction of the camera
     VRV.normalise();
-    VUV = VRV.cross(VPN);
+    VUV = VRV.cross(VPN); //Accurate up direction of the camera
     VUV.normalise();
+    double scale = 0.45; //Field of view
 
-    double scale = 1;
+    origin =  new Vector(-1000*(1-cameraRotationScale), 0, -1000*cameraRotationScale);
+    VRP.print();
+    origin.print();
 
     //col
     Vector bg_col = new Vector(0.5,0.5,0.5);
@@ -271,9 +293,7 @@ public class Main extends Application {
       for (i = 0; i < w; i++) {
         double u = (i-(w/2))*scale;
         double v = ((h-j)-h/2)*scale;
-        origin =  new Vector(0, 0, -400);
         direction = VRP.add(VRV.mul(u)).add(VUV.mul(v));
-        //direction.print();
         //origin =  new Vector(i-w/2.0, j-h/2.0, -600);
         boolean hasIntersected = false;
         double lowestT = 999999999;
