@@ -268,10 +268,9 @@ public class Main extends Application {
     Vector p; //3D points
 
     double cameraRotationScale = cameraRotation/360;
-    System.out.println(cameraRotationScale);
 
     //Perspective camera
-    Vector VRP = new Vector(400*(1-cameraRotationScale),0,400*cameraRotationScale); //Centre of the image plane
+    Vector VRP = new Vector(-400*(1-cameraRotationScale),0,400*cameraRotationScale); //Centre of the image plane
     Vector VUV = new Vector(0,1,0); //Approx up direction of the camera
     Vector lookAt = new Vector(0,0,0); //Point defining where the camera is pointing
     Vector VPN = lookAt.sub(VRP); //Direction the camera is looking
@@ -282,9 +281,7 @@ public class Main extends Application {
     VUV.normalise();
     double scale = 0.45; //Field of view
 
-    origin =  new Vector(-1000*(1-cameraRotationScale), 0, -1000*cameraRotationScale);
-    VRP.print();
-    origin.print();
+    origin =  new Vector(1000*(1-cameraRotationScale), 0, -1000*cameraRotationScale);
 
     //col
     Vector bg_col = new Vector(0.5,0.5,0.5);
