@@ -43,10 +43,10 @@ public class Main extends Application {
 
   double radius = 100;
 
-  double cameraRotation = 0;
+  double cameraRotation = 90;
 
   Sphere s1 = new Sphere(100, new Vector(0,0,0),new Vector(0.5,0.3,1));
-  Sphere s2 = new Sphere(100, new Vector(-160,160,160),new Vector(0.5,0.3,1));
+  Sphere s2 = new Sphere(100, new Vector(-160,160,160),new Vector(1,0.1,0));
   Sphere s3 = new Sphere(100, new Vector(160,-160,320),new Vector(0.5,0.3,1));
 
 
@@ -161,9 +161,9 @@ public class Main extends Application {
               } else {
                 System.out.println("Error while changing spheres");
               }
-              x_slider.setValue(selectedSphere.getCentPos().getX());
-              y_slider.setValue(selectedSphere.getCentPos().getY());
-              z_slider.setValue(selectedSphere.getCentPos().getZ());
+              x_slider.setValue(selectedSphere.getCentPos().x);
+              y_slider.setValue(selectedSphere.getCentPos().y);
+              z_slider.setValue(selectedSphere.getCentPos().z);
               r_slider.setValue(selectedSphere.getRed() * 255);
               g_slider.setValue(selectedSphere.getGreen() * 255);
               b_slider.setValue(selectedSphere.getBlue() * 255);
@@ -194,7 +194,7 @@ public class Main extends Application {
     //3. (referring to the 3 things we need to display an image)
     //we need to add it to the pane
 
-    root.add(view, 0, 0);;
+    root.add(view, 0, 0);
     root.add(hbox, 0, 1);
     //root.add(x_slider, 0, 1);
     root.add(y_slider, 0, 2);
@@ -260,17 +260,21 @@ public class Main extends Application {
     sphereArray.add(s2);
     sphereArray.add(s3);
 
-    Vector light = new Vector(0,300,-400);
+    Vector light = new Vector(0,300,-1000);
 
+    double vrpRadius = 400;
+    double originRadius = 1000;
 
-    Vector origin;
-    Vector direction = new Vector(0,0,1); //direction of ray
-    Vector p; //3D points
+    double vrpX = vrpRadius*Math.cos(Math.toRadians(cameraRotation));
+    double vrpZ = vrpRadius*Math.sin(Math.toRadians(cameraRotation));
 
-    double cameraRotationScale = cameraRotation/360;
+    double originX = -originRadius*Math.cos(Math.toRadians(cameraRotation));
+    double originZ = -originRadius*Math.sin(Math.toRadians(cameraRotation));
+
+    Vector origin =  new Vector(originX,0,originZ);
 
     //Perspective camera
-    Vector VRP = new Vector(-400*(1-cameraRotationScale),0,400*cameraRotationScale); //Centre of the image plane
+    Vector VRP = new Vector(vrpX,0,vrpZ); //Centre of the image plane
     Vector VUV = new Vector(0,1,0); //Approx up direction of the camera
     Vector lookAt = new Vector(0,0,0); //Point defining where the camera is pointing
     Vector VPN = lookAt.sub(VRP); //Direction the camera is looking
@@ -281,17 +285,14 @@ public class Main extends Application {
     VUV.normalise();
     double scale = 0.45; //Field of view
 
-    origin =  new Vector(1000*(1-cameraRotationScale), 0, -1000*cameraRotationScale);
-
     //col
     Vector bg_col = new Vector(0.5,0.5,0.5);
 
     for (j = 0; j < h; j++) {
       for (i = 0; i < w; i++) {
-        double u = (i-(w/2))*scale;
-        double v = ((h-j)-h/2)*scale;
-        direction = VRP.add(VRV.mul(u)).add(VUV.mul(v));
-        //origin =  new Vector(i-w/2.0, j-h/2.0, -600);
+        double u = (i-(w/2.0))*scale;
+        double v = ((h-j)-h/2.0)*scale;
+        Vector direction = VRP.add(VRV.mul(u)).add(VUV.mul(v));
         boolean hasIntersected = false;
         double lowestT = 999999999;
         Sphere closestSphere = null;
@@ -310,12 +311,12 @@ public class Main extends Application {
         if (!hasIntersected) {
           image_writer.setColor(i,j,Color.color(bg_col.x,bg_col.y,bg_col.z, 1.0));
         } else {
-          p = origin.add(direction.mul(closestSphere.findIntersection(origin,direction))); //line
-          Vector lv = light.sub(p);
-          lv.normalise();
-          Vector n = p.sub(closestSphere.getCentPos());
-          n.normalise();
-          double dp = lv.dot(n);
+          Vector ray = origin.add(direction.mul(closestSphere.findIntersection(origin,direction))); //line
+          Vector lightVector = light.sub(ray);
+          lightVector.normalise();
+          Vector normal = ray.sub(closestSphere.getCentPos());
+          normal.normalise();
+          double dp = lightVector.dot(normal);
           if (dp<0) dp = 0;
           if (dp>1) dp = 1;
           Vector col = closestSphere.getColour().mul(dp*0.7).add(closestSphere.getColour().mul(0.3));
