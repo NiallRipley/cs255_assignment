@@ -10,10 +10,7 @@ You may use libraries to achieve a better GUI
 import java.util.ArrayList;
 
 import javafx.application.Application;
-import javafx.geometry.HPos;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
@@ -21,9 +18,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.PixelWriter;
-import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -49,7 +44,6 @@ public class Main extends Application {
   Sphere s2 = new Sphere(100, new Vector(-160,160,160),new Vector(1,0.1,0));
   Sphere s3 = new Sphere(100, new Vector(160,-160,320),new Vector(0.5,0.3,1));
 
-
   @Override
   public void start(Stage stage) {
     stage.setTitle("Ray Tracing");
@@ -63,22 +57,31 @@ public class Main extends Application {
 
     //all values are related to middle sphere (s1)
     Slider x_slider = new Slider(-320, 320, 0);
+    x_slider.setPrefWidth(400);
     Slider y_slider = new Slider(-320, 320, 0);
+    y_slider.setPrefWidth(400);
     Slider z_slider = new Slider(-320, 320, 0);
+    z_slider.setPrefWidth(400);
 
     //Create the simple GUI
     Slider r_slider = new Slider(0, 255, red*255);
+    r_slider.setPrefWidth(400);
     Slider g_slider = new Slider(0, 255, green*255);
+    g_slider.setPrefWidth(400);
     Slider b_slider = new Slider(0, 255, blue*255);
+    b_slider.setPrefWidth(400);
 
     //radius slider
     Slider radius_slider = new Slider(10, 200, radius);
+    radius_slider.setPrefWidth(400);
 
     Slider camera_slider = new Slider(0, 360, cameraRotation);
+    camera_slider.setPrefWidth(400);
 
     ToggleGroup toggleSpheres = new ToggleGroup();
 
     RadioButton s1button = new RadioButton();
+    s1button.setPrefWidth(120);
     s1button.setToggleGroup(toggleSpheres);
     s1button.setSelected(true);
     s1button.setUserData("Sphere 1");
@@ -94,9 +97,6 @@ public class Main extends Application {
     s1button.setText("Sphere 1");
     s2button.setText("Sphere 2");
     s3button.setText("Sphere 3");
-
-    ScrollPane scroll = new ScrollPane();
-    scroll.setContent(view);
 
     x_slider.valueProperty().addListener(
             (observable, oldValue, newValue) -> {
@@ -180,35 +180,60 @@ public class Main extends Application {
     Render(image);
 
     GridPane root = new GridPane();
-    root.setVgap(12);
-    root.setHgap(12);
+    root.setVgap(15);
+    root.setHgap(15);
 
-    root.setAlignment(Pos.CENTER);
+    ScrollPane scroll = new ScrollPane();
+    scroll.setContent(root);
 
-    //needs tweaking
-    Label label = new Label("X Slider");
-    HBox hbox = new HBox(label, x_slider);
-    hbox.setMinWidth(Width);
-    hbox.setMaxWidth(Width);
 
-    //3. (referring to the 3 things we need to display an image)
-    //we need to add it to the pane
+    Label xSliderLabel = new Label("X Slider");
+    xSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
+    xSliderLabel.setPrefWidth(100);
+    Label ySliderLabel = new Label("Y Slider");
+    ySliderLabel.setPrefWidth(100);
+    ySliderLabel.setAlignment(Pos.BASELINE_RIGHT);
+    Label zSliderLabel = new Label("Z Slider");
+    zSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
+    zSliderLabel.setPrefWidth(100);
+    Label rSliderLabel = new Label("Red Slider");
+    rSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
+    rSliderLabel.setPrefWidth(100);
+    Label gSliderLabel = new Label("Green Slider");
+    gSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
+    gSliderLabel.setPrefWidth(100);
+    Label bSliderLabel = new Label("Blue Slider");
+    bSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
+    bSliderLabel.setPrefWidth(100);
+    Label radiusSliderLabel = new Label("Radius Slider");
+    radiusSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
+    radiusSliderLabel.setPrefWidth(100);
+    Label cameraSliderLabel = new Label("Camera Slider");
+    cameraSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
+    cameraSliderLabel.setPrefWidth(100);
 
     root.add(view, 0, 0);
-    root.add(hbox, 0, 1);
-    //root.add(x_slider, 0, 1);
-    root.add(y_slider, 0, 2);
-    root.add(z_slider, 0, 3);
+    GridPane.setColumnSpan(view, 3);
+    root.add(xSliderLabel, 0, 1);
+    root.add(ySliderLabel, 0, 2);
+    root.add(zSliderLabel, 0, 3);
+    root.add(rSliderLabel, 0, 4);
+    root.add(gSliderLabel, 0, 5);
+    root.add(bSliderLabel, 0, 6);
+    root.add(radiusSliderLabel, 0, 7);
+    root.add(cameraSliderLabel, 0, 8);
 
-    root.add(r_slider, 0, 4);
-    root.add(g_slider, 0, 5);
-    root.add(b_slider, 0, 6);
+    root.add(x_slider, 1, 1);
+    root.add(y_slider, 1, 2);
+    root.add(z_slider, 1, 3);
 
-    root.add(radius_slider, 0, 7);
+    root.add(r_slider, 1, 4);
+    root.add(g_slider, 1, 5);
+    root.add(b_slider, 1, 6);
 
-    root.add(camera_slider, 0, 8);
+    root.add(radius_slider, 1, 7);
 
-    root.getChildren().addAll(scroll);
+    root.add(camera_slider, 1, 8);
 
     root.add(s1button, 2, 1);
     root.add(s2button, 2, 2);
@@ -235,7 +260,7 @@ public class Main extends Application {
     camera_slider.setShowTickLabels(true);
 
     //Display to user
-    Scene scene = new Scene(root, 1024, 768);
+    Scene scene = new Scene(scroll, 1024, 768);
     stage.setScene(scene);
     stage.show();
   }
