@@ -10,7 +10,10 @@ You may use libraries to achieve a better GUI
 import java.util.ArrayList;
 
 import javafx.application.Application;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
@@ -18,7 +21,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.PixelWriter;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -40,9 +45,12 @@ public class Main extends Application {
 
   double cameraRotation = 90;
 
-  Sphere s1 = new Sphere(100, new Vector(0,0,0),new Vector(0.5,0.3,1));
-  Sphere s2 = new Sphere(100, new Vector(-160,160,160),new Vector(1,0.1,0));
-  Sphere s3 = new Sphere(100, new Vector(160,-160,320),new Vector(0.5,0.3,1));
+  double cameraElevation = 90;
+
+  Sphere s1 = new Sphere(100, new Vector(0,0,0),new Vector(1,0,0));
+  Sphere s2 = new Sphere(100, new Vector(-160,160,160),new Vector(0,1,0));
+  Sphere s3 = new Sphere(100, new Vector(160,-160,320),new Vector(0,0,1));
+
 
   @Override
   public void start(Stage stage) {
@@ -57,31 +65,24 @@ public class Main extends Application {
 
     //all values are related to middle sphere (s1)
     Slider x_slider = new Slider(-320, 320, 0);
-    x_slider.setPrefWidth(400);
     Slider y_slider = new Slider(-320, 320, 0);
-    y_slider.setPrefWidth(400);
     Slider z_slider = new Slider(-320, 320, 0);
-    z_slider.setPrefWidth(400);
 
     //Create the simple GUI
     Slider r_slider = new Slider(0, 255, red*255);
-    r_slider.setPrefWidth(400);
     Slider g_slider = new Slider(0, 255, green*255);
-    g_slider.setPrefWidth(400);
     Slider b_slider = new Slider(0, 255, blue*255);
-    b_slider.setPrefWidth(400);
 
     //radius slider
     Slider radius_slider = new Slider(10, 200, radius);
-    radius_slider.setPrefWidth(400);
 
     Slider camera_slider = new Slider(0, 360, cameraRotation);
-    camera_slider.setPrefWidth(400);
+
+    Slider elevation_slider = new Slider(0, 180, cameraElevation);
 
     ToggleGroup toggleSpheres = new ToggleGroup();
 
     RadioButton s1button = new RadioButton();
-    s1button.setPrefWidth(120);
     s1button.setToggleGroup(toggleSpheres);
     s1button.setSelected(true);
     s1button.setUserData("Sphere 1");
@@ -97,6 +98,9 @@ public class Main extends Application {
     s1button.setText("Sphere 1");
     s2button.setText("Sphere 2");
     s3button.setText("Sphere 3");
+
+    ScrollPane scroll = new ScrollPane();
+    scroll.setContent(view);
 
     x_slider.valueProperty().addListener(
             (observable, oldValue, newValue) -> {
@@ -146,6 +150,12 @@ public class Main extends Application {
               Render(image);
             });
 
+    elevation_slider.valueProperty().addListener(
+            (observable, oldValue, newValue) -> {
+              cameraElevation = newValue.doubleValue();
+              Render(image);
+            });
+
     //for x, y and z sliders
     toggleSpheres.selectedToggleProperty().addListener(
             (ov, old_toggle, new_toggle) -> {
@@ -180,60 +190,37 @@ public class Main extends Application {
     Render(image);
 
     GridPane root = new GridPane();
-    root.setVgap(15);
-    root.setHgap(15);
+    root.setVgap(12);
+    root.setHgap(12);
 
-    ScrollPane scroll = new ScrollPane();
-    scroll.setContent(root);
+    root.setAlignment(Pos.CENTER);
 
+    //needs tweaking
+    Label label = new Label("X Slider");
+    HBox hbox = new HBox(label, x_slider);
+    hbox.setMinWidth(Width);
+    hbox.setMaxWidth(Width);
 
-    Label xSliderLabel = new Label("X Slider");
-    xSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
-    xSliderLabel.setPrefWidth(100);
-    Label ySliderLabel = new Label("Y Slider");
-    ySliderLabel.setPrefWidth(100);
-    ySliderLabel.setAlignment(Pos.BASELINE_RIGHT);
-    Label zSliderLabel = new Label("Z Slider");
-    zSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
-    zSliderLabel.setPrefWidth(100);
-    Label rSliderLabel = new Label("Red Slider");
-    rSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
-    rSliderLabel.setPrefWidth(100);
-    Label gSliderLabel = new Label("Green Slider");
-    gSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
-    gSliderLabel.setPrefWidth(100);
-    Label bSliderLabel = new Label("Blue Slider");
-    bSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
-    bSliderLabel.setPrefWidth(100);
-    Label radiusSliderLabel = new Label("Radius Slider");
-    radiusSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
-    radiusSliderLabel.setPrefWidth(100);
-    Label cameraSliderLabel = new Label("Camera Slider");
-    cameraSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
-    cameraSliderLabel.setPrefWidth(100);
+    //3. (referring to the 3 things we need to display an image)
+    //we need to add it to the pane
 
     root.add(view, 0, 0);
-    GridPane.setColumnSpan(view, 3);
-    root.add(xSliderLabel, 0, 1);
-    root.add(ySliderLabel, 0, 2);
-    root.add(zSliderLabel, 0, 3);
-    root.add(rSliderLabel, 0, 4);
-    root.add(gSliderLabel, 0, 5);
-    root.add(bSliderLabel, 0, 6);
-    root.add(radiusSliderLabel, 0, 7);
-    root.add(cameraSliderLabel, 0, 8);
+    root.add(hbox, 0, 1);
+    //root.add(x_slider, 0, 1);
+    root.add(y_slider, 0, 2);
+    root.add(z_slider, 0, 3);
 
-    root.add(x_slider, 1, 1);
-    root.add(y_slider, 1, 2);
-    root.add(z_slider, 1, 3);
+    root.add(r_slider, 0, 4);
+    root.add(g_slider, 0, 5);
+    root.add(b_slider, 0, 6);
 
-    root.add(r_slider, 1, 4);
-    root.add(g_slider, 1, 5);
-    root.add(b_slider, 1, 6);
+    root.add(radius_slider, 0, 7);
 
-    root.add(radius_slider, 1, 7);
+    root.add(camera_slider, 0, 8);
 
-    root.add(camera_slider, 1, 8);
+    root.add(elevation_slider, 0, 9);
+
+    root.getChildren().addAll(scroll);
 
     root.add(s1button, 2, 1);
     root.add(s2button, 2, 2);
@@ -259,8 +246,11 @@ public class Main extends Application {
     camera_slider.setShowTickMarks(true);
     camera_slider.setShowTickLabels(true);
 
+    elevation_slider.setShowTickMarks(true);
+    elevation_slider.setShowTickLabels(true);
+
     //Display to user
-    Scene scene = new Scene(scroll, 1024, 768);
+    Scene scene = new Scene(root, 1024, 768);
     stage.setScene(scene);
     stage.show();
   }
@@ -290,16 +280,21 @@ public class Main extends Application {
     double vrpRadius = 400;
     double originRadius = 1000;
 
-    double vrpX = vrpRadius*Math.cos(Math.toRadians(cameraRotation));
-    double vrpZ = vrpRadius*Math.sin(Math.toRadians(cameraRotation));
+    if (cameraElevation == 0) cameraElevation = 0.1;
 
-    double originX = -originRadius*Math.cos(Math.toRadians(cameraRotation));
-    double originZ = -originRadius*Math.sin(Math.toRadians(cameraRotation));
+    //Spherical points calculations
+    double vrpX = vrpRadius*Math.sin(Math.toRadians(cameraElevation))*Math.cos(Math.toRadians(cameraRotation));
+    double vrpY = vrpRadius*Math.cos(Math.toRadians(cameraElevation));
+    double vrpZ = vrpRadius*Math.sin(Math.toRadians(cameraElevation))*Math.sin(Math.toRadians(cameraRotation));
 
-    Vector origin =  new Vector(originX,0,originZ);
+    double originX = -originRadius*Math.sin(Math.toRadians(cameraElevation))*Math.cos(Math.toRadians(cameraRotation));
+    double originY = -originRadius*Math.cos(Math.toRadians(cameraElevation));
+    double originZ = -originRadius*Math.sin(Math.toRadians(cameraElevation))*Math.sin(Math.toRadians(cameraRotation));
+
+    Vector origin =  new Vector(originX,originY,originZ);
 
     //Perspective camera
-    Vector VRP = new Vector(vrpX,0,vrpZ); //Centre of the image plane
+    Vector VRP = new Vector(vrpX,vrpY,vrpZ); //Centre of the image plane
     Vector VUV = new Vector(0,1,0); //Approx up direction of the camera
     Vector lookAt = new Vector(0,0,0); //Point defining where the camera is pointing
     Vector VPN = lookAt.sub(VRP); //Direction the camera is looking
@@ -310,9 +305,16 @@ public class Main extends Application {
     VUV.normalise();
     double scale = 0.45; //Field of view
 
-    //col
-    Vector bg_col = new Vector(0.5,0.5,0.5);
+    //Background colour
+    Vector bg_col = new Vector(0,0,0);
 
+    //Light colour
+    Vector lightColour = new Vector(1,1,1);
+
+    //Object shininess
+    double shininess = 1;
+
+    //Looping through each pixel
     for (j = 0; j < h; j++) {
       for (i = 0; i < w; i++) {
         double u = (i-(w/2.0))*scale;
@@ -322,6 +324,7 @@ public class Main extends Application {
         double lowestT = 999999999;
         Sphere closestSphere = null;
 
+        //Finding the closest point of intersection.
         for (Sphere currentSp : sphereArray) {
           if (currentSp.checkIntersection(origin, direction)) {
             double intersectionPoint = currentSp.findIntersection(origin, direction);
@@ -333,18 +336,24 @@ public class Main extends Application {
           }
         }
 
-        if (!hasIntersected) {
+        if (!hasIntersected) { //No sphere hit
           image_writer.setColor(i,j,Color.color(bg_col.x,bg_col.y,bg_col.z, 1.0));
-        } else {
-          Vector ray = origin.add(direction.mul(closestSphere.findIntersection(origin,direction))); //line
-          Vector lightVector = light.sub(ray);
+        } else { //Sphere hit
+          Vector pointOfIntersection = origin.add(direction.mul(closestSphere.findIntersection(origin,direction)));
+          Vector lightVector = light.sub(pointOfIntersection);
           lightVector.normalise();
-          Vector normal = ray.sub(closestSphere.getCentPos());
+          Vector normal = pointOfIntersection.sub(closestSphere.getCentPos());
           normal.normalise();
           double dp = lightVector.dot(normal);
+          Vector lightReflection = normal.mul(2*dp).sub(lightVector);
+          lightReflection.normalise();
+          double dp2 = lightReflection.dot(direction);
+          if (dp2<0) dp2 = 0;
+          if (dp2>1) dp2 = 1;
           if (dp<0) dp = 0;
           if (dp>1) dp = 1;
-          Vector col = closestSphere.getColour().mul(dp*0.7).add(closestSphere.getColour().mul(0.3));
+          Vector col = closestSphere.getColour().mul(dp*0.7).add(closestSphere.getColour().mul(0.3));//.add(closestSphere.getColour().mul(Math.pow(dp2, shininess)));
+
           image_writer.setColor(i, j, Color.color(col.x, col.y, col.z, 1.0));
         }
       } // column loop (x-axis loop)
