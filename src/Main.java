@@ -98,6 +98,7 @@ public class Main extends Application {
     sliderArray.add(elevation_slider);
 
     RadioButton s1button = new RadioButton();
+    //sets default selected sphere
     s1button.setSelected(true);
     RadioButton s2button = new RadioButton();
     RadioButton s3button = new RadioButton();
@@ -223,6 +224,7 @@ public class Main extends Application {
 
     Render(image);
 
+    //scroll pane alongside window
     ScrollPane scroll = new ScrollPane();
     scroll.setContent(root);
 
@@ -233,7 +235,10 @@ public class Main extends Application {
     root.add(s2button, 2, 2);
     root.add(s3button, 2, 3);
 
-    //Display to user
+    /*
+    Display to user, display the scroll because
+    the gridpane(root) has been set to it
+     */
     Scene scene = new Scene(scroll, 768, 768);
     stage.setScene(scene);
     stage.show();
