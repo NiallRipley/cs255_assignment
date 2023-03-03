@@ -10,10 +10,7 @@ You may use libraries to achieve a better GUI
 import java.util.ArrayList;
 
 import javafx.application.Application;
-import javafx.geometry.HPos;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
@@ -21,15 +18,17 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.PixelWriter;
-import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class Main extends Application {
   int Width = 640;
   int Height = 640;
 
+  /*
+  sphere that is currently selected(changed by the buttons).
+  Starting selected sphere is the middle one, sphere 1
+   */
   int selected = 0;
   Sphere selectedSphere;
 
@@ -51,17 +50,17 @@ public class Main extends Application {
   Sphere s2 = new Sphere(100, new Vector(-160,160,160),new Vector(0,1,0));
   Sphere s3 = new Sphere(100, new Vector(160,-160,320),new Vector(0,0,1));
 
-
   @Override
   public void start(Stage stage) {
 
+    //the grid that the image, sliders, buttons and labels are on
     GridPane root = new GridPane();
     root.setVgap(15);
     root.setHgap(15);
 
     ArrayList<Slider> sliderArray = new ArrayList<>();
-    stage.setTitle("Ray Tracing");
 
+    stage.setTitle("Ray Tracing");
     //We need 3 things to see an image
     //1. We create an image we can write to
     WritableImage image = new WritableImage(Width, Height);
@@ -88,6 +87,7 @@ public class Main extends Application {
     //Camera elevation slider
     Slider elevation_slider = new Slider(0, 180, cameraElevation);
 
+    //reduces lines and lines of sliders being added
     sliderArray.add(x_slider);
     sliderArray.add(y_slider);
     sliderArray.add(z_slider);
@@ -98,25 +98,40 @@ public class Main extends Application {
     sliderArray.add(camera_slider);
     sliderArray.add(elevation_slider);
 
-    ToggleGroup toggleSpheres = new ToggleGroup();
-
     RadioButton s1button = new RadioButton();
-    s1button.setPrefWidth(120);
-    s1button.setToggleGroup(toggleSpheres);
     s1button.setSelected(true);
-    s1button.setUserData("Sphere 1");
-
     RadioButton s2button = new RadioButton();
-    s2button.setToggleGroup(toggleSpheres);
-    s2button.setUserData("Sphere 2");
-
     RadioButton s3button = new RadioButton();
-    s3button.setToggleGroup(toggleSpheres);
-    s3button.setUserData("Sphere 3");
 
-    s1button.setText("Sphere 1");
-    s2button.setText("Sphere 2");
-    s3button.setText("Sphere 3");
+    ArrayList<RadioButton> radioButtonArrayList = new ArrayList<>();
+    radioButtonArrayList.add(s1button);
+    radioButtonArrayList.add(s2button);
+    radioButtonArrayList.add(s3button);
+
+    //toggle group that the sphere buttons are assigned too
+    ToggleGroup ToggleGroupRadioButtons = new ToggleGroup();
+
+    /*
+    setting all the buttons to same ToggleGroup,
+    setting user data and the text beside the button
+     */
+    for (int i = 0; i < radioButtonArrayList.size(); i++) {
+      radioButtonArrayList.get(i).setToggleGroup(ToggleGroupRadioButtons);
+      switch (i) {
+        case 0 -> {
+          radioButtonArrayList.get(i).setUserData("Sphere 1");
+          radioButtonArrayList.get(i).setText("Sphere 1");
+        }
+        case 1 -> {
+          radioButtonArrayList.get(i).setUserData("Sphere 2");
+          radioButtonArrayList.get(i).setText("Sphere 2");
+        }
+        case 2 -> {
+          radioButtonArrayList.get(i).setUserData("Sphere 3");
+          radioButtonArrayList.get(i).setText("Sphere 3");
+        }
+      }
+    }
 
     for (int i = 0; i<sliderArray.size(); i++) {
       Slider currentSlider = sliderArray.get(i);
@@ -186,15 +201,15 @@ public class Main extends Application {
     }
 
     //for x, y and z sliders
-    toggleSpheres.selectedToggleProperty().addListener(
+    ToggleGroupRadioButtons.selectedToggleProperty().addListener(
             (ov, old_toggle, new_toggle) -> {
-              if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 1") {
+              if (ToggleGroupRadioButtons.getSelectedToggle().getUserData() == "Sphere 1") {
                 selectedSphere = s1;
                 selected = 0;
-              } else if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 2") {
+              } else if (ToggleGroupRadioButtons.getSelectedToggle().getUserData() == "Sphere 2") {
                 selectedSphere = s2;
                 selected = 1;
-              } else if (toggleSpheres.getSelectedToggle().getUserData() == "Sphere 3") {
+              } else if (ToggleGroupRadioButtons.getSelectedToggle().getUserData() == "Sphere 3") {
                 selectedSphere = s3;
                 selected = 2;
               } else {
