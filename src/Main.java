@@ -10,7 +10,10 @@ You may use libraries to achieve a better GUI
 import java.util.ArrayList;
 
 import javafx.application.Application;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
@@ -18,7 +21,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.PixelWriter;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -66,11 +71,8 @@ public class Main extends Application {
 
     //XYZ sliders
     Slider x_slider = new Slider(-320, 320, 0);
-    x_slider.setPrefWidth(400);
     Slider y_slider = new Slider(-320, 320, 0);
-    y_slider.setPrefWidth(400);
     Slider z_slider = new Slider(-320, 320, 0);
-    z_slider.setPrefWidth(400);
 
     //Colour sliders
     Slider r_slider = new Slider(0, 255, red*255);
@@ -118,48 +120,69 @@ public class Main extends Application {
 
     for (int i = 0; i<sliderArray.size(); i++) {
       Slider currentSlider = sliderArray.get(i);
+      Label currentLabel = null;
       currentSlider.setShowTickMarks(true);
       currentSlider.setShowTickLabels(true);
       elevation_slider.setPrefWidth(400);
       switch (i) {
-        case 0 -> currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+        case 0 -> {currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
           x = newValue.doubleValue();
           Render(image);
         });
-        case 1 -> currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+          currentLabel = new Label("X Position");}
+        case 1 -> {currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
           y = newValue.doubleValue();
           Render(image);
         });
-        case 2 -> currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+          currentLabel = new Label("Y Position");
+        }
+        case 2 -> {currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
           z = newValue.doubleValue();
           Render(image);
         });
-        case 3 -> currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-          red = newValue.doubleValue();
+          currentLabel = new Label("Z Position");
+        }
+        case 3 -> {currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+          red = newValue.doubleValue()/255;
           Render(image);
         });
-        case 4 -> currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-          green = newValue.doubleValue();
+          currentLabel = new Label("Red");
+        }
+        case 4 -> {currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+          green = newValue.doubleValue()/255;
           Render(image);
         });
-        case 5 -> currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-          blue = newValue.doubleValue();
+          currentLabel = new Label("Green");
+        }
+        case 5 -> {currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+          blue = newValue.doubleValue()/255;
           Render(image);
         });
-        case 6 -> currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+          currentLabel = new Label("Blue");
+        }
+        case 6 -> {currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
           radius = newValue.doubleValue();
           Render(image);
         });
-        case 7 -> currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+          currentLabel = new Label("Radius");
+        }
+        case 7 -> {currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
           cameraRotation = newValue.doubleValue();
           Render(image);
         });
-        case 8 -> currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+          currentLabel = new Label("Camera Rotation");
+        }
+        case 8 -> {currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
           cameraElevation = newValue.doubleValue();
           Render(image);
         });
+          currentLabel = new Label("Camera Elevation");
+        }
       }
+      currentLabel.setAlignment(Pos.BASELINE_RIGHT);
+      currentLabel.setPrefWidth(100);
       root.add(currentSlider, 1, i + 1);
+      root.add(currentLabel, 0, i+1);
     }
 
     //for x, y and z sliders
@@ -184,7 +207,7 @@ public class Main extends Application {
               sliderArray.get(i++).setValue(selectedSphere.getRed() * 255);
               sliderArray.get(i++).setValue(selectedSphere.getGreen() * 255);
               sliderArray.get(i++).setValue(selectedSphere.getBlue() * 255);
-              sliderArray.get(i++).setValue(selectedSphere.getRadius());
+              sliderArray.get(i).setValue(selectedSphere.getRadius());
             });
 
     //The following is in case you want to interact with the image in any way
@@ -199,49 +222,8 @@ public class Main extends Application {
     ScrollPane scroll = new ScrollPane();
     scroll.setContent(root);
 
-
-    Label xSliderLabel = new Label("X Slider");
-    xSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
-    xSliderLabel.setPrefWidth(100);
-    Label ySliderLabel = new Label("Y Slider");
-    ySliderLabel.setPrefWidth(100);
-    ySliderLabel.setAlignment(Pos.BASELINE_RIGHT);
-    Label zSliderLabel = new Label("Z Slider");
-    zSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
-    zSliderLabel.setPrefWidth(100);
-    Label rSliderLabel = new Label("Red Slider");
-    rSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
-    rSliderLabel.setPrefWidth(100);
-    Label gSliderLabel = new Label("Green Slider");
-    gSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
-    gSliderLabel.setPrefWidth(100);
-    Label bSliderLabel = new Label("Blue Slider");
-    bSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
-    bSliderLabel.setPrefWidth(100);
-    Label radiusSliderLabel = new Label("Radius Slider");
-    radiusSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
-    radiusSliderLabel.setPrefWidth(100);
-    Label cameraSliderLabel = new Label("Rotation Slider");
-    cameraSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
-    cameraSliderLabel.setPrefWidth(100);
-    Label elevationSliderLabel = new Label("Elevation Slider");
-    elevationSliderLabel.setAlignment(Pos.BASELINE_RIGHT);
-    elevationSliderLabel.setPrefWidth(100);
-
     root.add(view,0,0);
     GridPane.setColumnSpan(view, 3);
-    root.add(xSliderLabel, 0, 1);
-    root.add(ySliderLabel, 0, 2);
-    root.add(zSliderLabel, 0, 3);
-    root.add(rSliderLabel, 0, 4);
-    root.add(gSliderLabel, 0, 5);
-    root.add(bSliderLabel, 0, 6);
-    root.add(radiusSliderLabel, 0, 7);
-    root.add(cameraSliderLabel, 0, 8);
-    root.add(elevationSliderLabel, 0, 9);
-
-    //3. (referring to the 3 things we need to display an image)
-    //we need to add it to the pane
 
     root.add(s1button, 2, 1);
     root.add(s2button, 2, 2);
