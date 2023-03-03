@@ -87,7 +87,6 @@ public class Main extends Application {
     //Camera elevation slider
     Slider elevation_slider = new Slider(0, 180, cameraElevation);
 
-    //reduces lines and lines of sliders being added
     sliderArray.add(x_slider);
     sliderArray.add(y_slider);
     sliderArray.add(z_slider);
@@ -116,23 +115,13 @@ public class Main extends Application {
     setting user data and the text beside the button
      */
     for (int i = 0; i < radioButtonArrayList.size(); i++) {
+      int sphereInt = i+1;
       radioButtonArrayList.get(i).setToggleGroup(ToggleGroupRadioButtons);
-      switch (i) {
-        case 0 -> {
-          radioButtonArrayList.get(i).setUserData("Sphere 1");
-          radioButtonArrayList.get(i).setText("Sphere 1");
-        }
-        case 1 -> {
-          radioButtonArrayList.get(i).setUserData("Sphere 2");
-          radioButtonArrayList.get(i).setText("Sphere 2");
-        }
-        case 2 -> {
-          radioButtonArrayList.get(i).setUserData("Sphere 3");
-          radioButtonArrayList.get(i).setText("Sphere 3");
-        }
-      }
+      radioButtonArrayList.get(i).setUserData("Sphere " + sphereInt);
+      radioButtonArrayList.get(i).setText("Sphere " + sphereInt);
     }
 
+    //Adding listeners and labels to sliders
     for (int i = 0; i<sliderArray.size(); i++) {
       Slider currentSlider = sliderArray.get(i);
       Label currentLabel = null;
@@ -203,13 +192,13 @@ public class Main extends Application {
     //for x, y and z sliders
     ToggleGroupRadioButtons.selectedToggleProperty().addListener(
             (ov, old_toggle, new_toggle) -> {
-              if (ToggleGroupRadioButtons.getSelectedToggle().getUserData() == "Sphere 1") {
+              if (ToggleGroupRadioButtons.getSelectedToggle().getUserData().equals("Sphere 1")) {
                 selectedSphere = s1;
                 selected = 0;
-              } else if (ToggleGroupRadioButtons.getSelectedToggle().getUserData() == "Sphere 2") {
+              } else if (ToggleGroupRadioButtons.getSelectedToggle().getUserData().equals("Sphere 2")) {
                 selectedSphere = s2;
                 selected = 1;
-              } else if (ToggleGroupRadioButtons.getSelectedToggle().getUserData() == "Sphere 3") {
+              } else if (ToggleGroupRadioButtons.getSelectedToggle().getUserData().equals("Sphere 3")) {
                 selectedSphere = s3;
                 selected = 2;
               } else {
@@ -257,6 +246,7 @@ public class Main extends Application {
 
     ArrayList<Sphere> sphereArray = new ArrayList<>();
 
+    //Changing values of only the selected sphere
     switch (selected) {
       case 0 ->
               s1 = new Sphere(radius, new Vector(x, y, z), new Vector(red, green, blue));
