@@ -10,7 +10,10 @@ You may use libraries to achieve a better GUI
 import java.util.ArrayList;
 
 import javafx.application.Application;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
@@ -18,7 +21,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.PixelWriter;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -49,6 +54,12 @@ public class Main extends Application {
 
   @Override
   public void start(Stage stage) {
+
+    GridPane root = new GridPane();
+    root.setVgap(15);
+    root.setHgap(15);
+
+    ArrayList<Slider> sliderArray = new ArrayList<>();
     stage.setTitle("Ray Tracing");
 
     //We need 3 things to see an image
@@ -58,7 +69,7 @@ public class Main extends Application {
     ImageView view = new ImageView(image);
     //3. Add to the pane (below)
 
-    //all values are related to middle sphere (s1)
+    //XYZ sliders
     Slider x_slider = new Slider(-320, 320, 0);
     x_slider.setPrefWidth(400);
     Slider y_slider = new Slider(-320, 320, 0);
@@ -66,23 +77,29 @@ public class Main extends Application {
     Slider z_slider = new Slider(-320, 320, 0);
     z_slider.setPrefWidth(400);
 
-    //Create the simple GUI
+    //Colour sliders
     Slider r_slider = new Slider(0, 255, red*255);
-    r_slider.setPrefWidth(400);
     Slider g_slider = new Slider(0, 255, green*255);
-    g_slider.setPrefWidth(400);
     Slider b_slider = new Slider(0, 255, blue*255);
-    b_slider.setPrefWidth(400);
 
     //radius slider
     Slider radius_slider = new Slider(10, 200, radius);
-    radius_slider.setPrefWidth(400);
 
+    //Camera rotation slider
     Slider camera_slider = new Slider(0, 360, cameraRotation);
-    camera_slider.setPrefWidth(400);
 
+    //Camera elevation slider
     Slider elevation_slider = new Slider(0, 180, cameraElevation);
-    elevation_slider.setPrefWidth(400);
+
+    sliderArray.add(x_slider);
+    sliderArray.add(y_slider);
+    sliderArray.add(z_slider);
+    sliderArray.add(r_slider);
+    sliderArray.add(g_slider);
+    sliderArray.add(b_slider);
+    sliderArray.add(radius_slider);
+    sliderArray.add(camera_slider);
+    sliderArray.add(elevation_slider);
 
     ToggleGroup toggleSpheres = new ToggleGroup();
 
@@ -104,59 +121,51 @@ public class Main extends Application {
     s2button.setText("Sphere 2");
     s3button.setText("Sphere 3");
 
-    x_slider.valueProperty().addListener(
-            (observable, oldValue, newValue) -> {
-              x = newValue.doubleValue();
-              Render(image);
-            });
-
-    y_slider.valueProperty().addListener(
-            (observable, oldValue, newValue) -> {
-              y = newValue.doubleValue();
-              Render(image);
-            });
-
-    z_slider.valueProperty().addListener(
-            (observable, oldValue, newValue) -> {
-              z = newValue.doubleValue();
-              Render(image);
-            });
-
-    r_slider.valueProperty().addListener(
-            (observable, oldValue, newValue) -> {
-              red = newValue.doubleValue() / 255;
-              Render(image);
-            });
-
-    g_slider.valueProperty().addListener(
-            (observable, oldValue, newValue) -> {
-              green = newValue.doubleValue() / 255;
-              Render(image);
-            });
-
-    b_slider.valueProperty().addListener(
-            (observable, oldValue, newValue) -> {
-              blue = newValue.doubleValue() / 255;
-              Render(image);
-            });
-
-    radius_slider.valueProperty().addListener(
-            (observable, oldValue, newValue) -> {
-              radius = newValue.doubleValue();
-              Render(image);
-            });
-
-    camera_slider.valueProperty().addListener(
-            (observable, oldValue, newValue) -> {
-              cameraRotation = newValue.doubleValue();
-              Render(image);
-            });
-
-    elevation_slider.valueProperty().addListener(
-            (observable, oldValue, newValue) -> {
-              cameraElevation = newValue.doubleValue();
-              Render(image);
-            });
+    for (int i = 0; i<sliderArray.size(); i++) {
+      Slider currentSlider = sliderArray.get(i);
+      currentSlider.setShowTickMarks(true);
+      currentSlider.setShowTickLabels(true);
+      elevation_slider.setPrefWidth(400);
+      switch (i) {
+        case 0 -> currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+          x = newValue.doubleValue();
+          Render(image);
+        });
+        case 1 -> currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+          y = newValue.doubleValue();
+          Render(image);
+        });
+        case 2 -> currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+          z = newValue.doubleValue();
+          Render(image);
+        });
+        case 3 -> currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+          red = newValue.doubleValue();
+          Render(image);
+        });
+        case 4 -> currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+          green = newValue.doubleValue();
+          Render(image);
+        });
+        case 5 -> currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+          blue = newValue.doubleValue();
+          Render(image);
+        });
+        case 6 -> currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+          radius = newValue.doubleValue();
+          Render(image);
+        });
+        case 7 -> currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+          cameraRotation = newValue.doubleValue();
+          Render(image);
+        });
+        case 8 -> currentSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+          cameraElevation = newValue.doubleValue();
+          Render(image);
+        });
+      }
+      root.add(currentSlider, 1, i + 1);
+    }
 
     //for x, y and z sliders
     toggleSpheres.selectedToggleProperty().addListener(
@@ -173,13 +182,14 @@ public class Main extends Application {
               } else {
                 System.out.println("Error while changing spheres");
               }
-              x_slider.setValue(selectedSphere.getCentPos().x);
-              y_slider.setValue(selectedSphere.getCentPos().y);
-              z_slider.setValue(selectedSphere.getCentPos().z);
-              r_slider.setValue(selectedSphere.getRed() * 255);
-              g_slider.setValue(selectedSphere.getGreen() * 255);
-              b_slider.setValue(selectedSphere.getBlue() * 255);
-              radius_slider.setValue(selectedSphere.getRadius());
+              int i = 0;
+              sliderArray.get(i++).setValue(selectedSphere.getCentPos().x);
+              sliderArray.get(i++).setValue(selectedSphere.getCentPos().y);
+              sliderArray.get(i++).setValue(selectedSphere.getCentPos().z);
+              sliderArray.get(i++).setValue(selectedSphere.getRed() * 255);
+              sliderArray.get(i++).setValue(selectedSphere.getGreen() * 255);
+              sliderArray.get(i++).setValue(selectedSphere.getBlue() * 255);
+              sliderArray.get(i++).setValue(selectedSphere.getRadius());
             });
 
     //The following is in case you want to interact with the image in any way
@@ -190,10 +200,6 @@ public class Main extends Application {
     });
 
     Render(image);
-
-    GridPane root = new GridPane();
-    root.setVgap(15);
-    root.setHgap(15);
 
     ScrollPane scroll = new ScrollPane();
     scroll.setContent(root);
@@ -239,45 +245,12 @@ public class Main extends Application {
     root.add(cameraSliderLabel, 0, 8);
     root.add(elevationSliderLabel, 0, 9);
 
-    root.add(x_slider, 1, 1);
-    root.add(y_slider, 1, 2);
-    root.add(z_slider, 1, 3);
-    root.add(r_slider, 1, 4);
-    root.add(g_slider, 1, 5);
-    root.add(b_slider, 1, 6);
-    root.add(radius_slider, 1, 7);
-    root.add(camera_slider, 1, 8);
-    root.add(elevation_slider,1,9);
-
     //3. (referring to the 3 things we need to display an image)
     //we need to add it to the pane
 
     root.add(s1button, 2, 1);
     root.add(s2button, 2, 2);
     root.add(s3button, 2, 3);
-
-    x_slider.setShowTickMarks(true);
-    x_slider.setShowTickLabels(true);
-    y_slider.setShowTickMarks(true);
-    y_slider.setShowTickLabels(true);
-    z_slider.setShowTickMarks(true);
-    z_slider.setShowTickLabels(true);
-
-    r_slider.setShowTickMarks(true);
-    r_slider.setShowTickLabels(true);
-    g_slider.setShowTickMarks(true);
-    g_slider.setShowTickLabels(true);
-    b_slider.setShowTickMarks(true);
-    b_slider.setShowTickLabels(true);
-
-    radius_slider.setShowTickMarks(true);
-    radius_slider.setShowTickLabels(true);
-
-    camera_slider.setShowTickMarks(true);
-    camera_slider.setShowTickLabels(true);
-
-    elevation_slider.setShowTickMarks(true);
-    elevation_slider.setShowTickLabels(true);
 
     //Display to user
     Scene scene = new Scene(scroll, 768, 768);
