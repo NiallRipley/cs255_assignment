@@ -1,4 +1,8 @@
 /*
+2018181, Niall Ripley
+2121047, Ben Stott
+Worked as a pair for this assignment
+
 CS-255 Getting started code for the assignment
 I do not give you permission to post this code online
 Do not post your solution online
