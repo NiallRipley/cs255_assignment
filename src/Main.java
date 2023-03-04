@@ -248,6 +248,10 @@ public class Main extends Application {
       if (distanceMoved.y < -rotationLimit) distanceMoved.y=-rotationLimit;
       cameraElevation -= distanceMoved.y/100;
       cameraRotation += distanceMoved.x/50;
+      if (cameraRotation < 0) cameraRotation+=360;
+      if (cameraElevation < 0) cameraElevation=0;
+      if (cameraRotation >360) cameraRotation-=360;
+      if (cameraElevation >180) cameraElevation=180;
       Render(image);
       event.consume();
     });
