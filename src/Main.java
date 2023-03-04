@@ -17,6 +17,7 @@ import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.image.ImageView;
@@ -194,6 +195,9 @@ public class Main extends Application {
       root.add(currentLabel, 0, i+1);
     }
 
+
+
+
     //for x, y and z sliders
     ToggleGroupRadioButtons.selectedToggleProperty().addListener(
             (ov, old_toggle, new_toggle) -> {
@@ -219,10 +223,32 @@ public class Main extends Application {
               sliderArray.get(i).setValue(selectedSphere.getRadius());
             });
 
+
+    Vector mousePressedPosition = new Vector(0,0,0);
     //The following is in case you want to interact with the image in any way
     //e.g., for user interaction, or you can find out the pixel position for debugging
     view.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
-      System.out.println(event.getX() + " " + event.getY());
+      mousePressedPosition.x = event.getX();
+      mousePressedPosition.y = event.getY();
+      event.consume();
+    });
+
+    view.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
+      camera_slider.setValue(cameraRotation);
+      elevation_slider.setValue(cameraElevation);
+      event.consume();
+    });
+
+    view.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
+      Vector distanceMoved = mousePressedPosition.sub(new Vector(event.getX(),event.getY(),0));
+      double rotationLimit = 250;
+      if (distanceMoved.x > rotationLimit) distanceMoved.x=rotationLimit;
+      if (distanceMoved.y > rotationLimit) distanceMoved.y=rotationLimit;
+      if (distanceMoved.x < -rotationLimit) distanceMoved.x=-rotationLimit;
+      if (distanceMoved.y < -rotationLimit) distanceMoved.y=-rotationLimit;
+      cameraElevation -= distanceMoved.y/100;
+      cameraRotation += distanceMoved.x/50;
+      Render(image);
       event.consume();
     });
 
@@ -243,7 +269,7 @@ public class Main extends Application {
     Display to user, display the scroll because
     the gridpane(root) has been set to it
      */
-    Scene scene = new Scene(scroll, 768, 768);
+    Scene scene = new Scene(scroll, 645, 1130);
     stage.setScene(scene);
     stage.show();
   }
@@ -333,10 +359,10 @@ public class Main extends Application {
         if (!hasIntersected) { //No sphere hit
           image_writer.setColor(i,j,Color.color(bg_col.x,bg_col.y,bg_col.z, 1.0));
         } else { //Sphere hit
-          Vector pointOfIntersection = origin.add(direction.mul(closestSphere.findIntersection(origin,direction)));
-          Vector lightVector = light.sub(pointOfIntersection);
+          Vector intersectingRay = origin.add(direction.mul(closestSphere.findIntersection(origin,direction)));
+          Vector lightVector = light.sub(intersectingRay);
           lightVector.normalise();
-          Vector normal = pointOfIntersection.sub(closestSphere.getCentPos());
+          Vector normal = intersectingRay.sub(closestSphere.getCentPos());
           normal.normalise();
           double dp = lightVector.dot(normal);
           Vector lightReflection = normal.mul(2*dp).sub(lightVector);
