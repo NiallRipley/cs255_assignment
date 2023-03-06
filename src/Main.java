@@ -12,12 +12,13 @@ All of those functions must be written by yourself
 You may use libraries to achieve a better GUI
 */
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.image.ImageView;
@@ -222,14 +223,17 @@ public class Main extends Application {
               sliderArray.get(i++).setValue(selectedSphere.getBlue() * 255);
               sliderArray.get(i).setValue(selectedSphere.getRadius());
             });
+    AtomicReference<Vector> rotationAnchor = new AtomicReference<>(new Vector(0, 0, 0));
+    AtomicReference<Double> startElevation = new AtomicReference<>((double) 0);
+    AtomicReference<Double> startRotation = new AtomicReference<>((double) 0);
 
-
-    Vector mousePressedPosition = new Vector(0,0,0);
     //The following is in case you want to interact with the image in any way
     //e.g., for user interaction, or you can find out the pixel position for debugging
     view.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
-      mousePressedPosition.x = event.getX();
-      mousePressedPosition.y = event.getY();
+      Vector cursorPos = new Vector(event.getX(),event.getY(),0);
+      rotationAnchor.set(cursorPos);
+      startElevation.set(cameraElevation);
+      startRotation.set(cameraRotation);
       event.consume();
     });
 
@@ -240,14 +244,10 @@ public class Main extends Application {
     });
 
     view.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
-      Vector distanceMoved = mousePressedPosition.sub(new Vector(event.getX(),event.getY(),0));
-      double rotationLimit = 250;
-      if (distanceMoved.x > rotationLimit) distanceMoved.x=rotationLimit;
-      if (distanceMoved.y > rotationLimit) distanceMoved.y=rotationLimit;
-      if (distanceMoved.x < -rotationLimit) distanceMoved.x=-rotationLimit;
-      if (distanceMoved.y < -rotationLimit) distanceMoved.y=-rotationLimit;
-      cameraElevation -= distanceMoved.y/100;
-      cameraRotation += distanceMoved.x/50;
+      Vector cursorPos = new Vector(event.getX(),event.getY(),0);
+      Vector distanceMoved = rotationAnchor.get().sub(new Vector(event.getX(),event.getY(),0));
+      cameraElevation = startElevation.get() + distanceMoved.y/10;
+      cameraRotation = startRotation.get() + distanceMoved.x/5;
       if (cameraRotation < 0) cameraRotation+=360;
       if (cameraElevation < 0) cameraElevation=0;
       if (cameraRotation >360) cameraRotation-=360;
